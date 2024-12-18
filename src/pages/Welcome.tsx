@@ -1,4 +1,4 @@
-import { Line } from '@ant-design/charts';
+import { Column, Line, Pie } from '@ant-design/charts';
 import { PageContainer } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
 import { theme } from 'antd';
@@ -131,6 +131,55 @@ const config = {
   },
 };
 
+const pieConfig = {
+  data: [
+    { type: '分类一', value: 27 },
+    { type: '分类二', value: 25 },
+    { type: '分类三', value: 18 },
+    { type: '分类四', value: 15 },
+    { type: '分类五', value: 10 },
+    { type: '其他', value: 5 },
+  ],
+  angleField: 'value',
+  colorField: 'type',
+  label: {
+    text: 'value',
+    style: {
+      fontWeight: 'bold',
+    },
+  },
+  legend: {
+    color: {
+      title: false,
+      position: 'right',
+      rowPadding: 5,
+    },
+  },
+};
+
+const columnConfig = {
+  data: {
+    type: 'fetch',
+    value: 'https://render.alipay.com/p/yuyan/180020010001215413/antd-charts/column-column.json',
+  },
+  xField: 'letter',
+  yField: 'frequency',
+  label: {
+    text: (d) => `${(d.frequency * 100).toFixed(1)}%`,
+    textBaseline: 'bottom',
+  },
+  axis: {
+    y: {
+      labelFormatter: '.0%',
+    },
+  },
+  style: {
+    // 圆角样式
+    radiusTopLeft: 10,
+    radiusTopRight: 10,
+  },
+};
+
 const Welcome: React.FC = () => {
   const { token } = theme.useToken();
   const { initialState } = useModel('@@initialState');
@@ -156,6 +205,25 @@ const Welcome: React.FC = () => {
             <p className="text-sm text-muted-foreground">12月</p>
           </div>
           <Line {...config} />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 md:gap-8">
+          <div className="rounded-xl border bg-card text-card-foreground shadow">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="font-semibold leading-none tracking-tight">上传合同统计</h3>
+              <p className="text-sm text-muted-foreground">30天</p>
+            </div>
+            <div className="p-6 pt-0">
+              <Column {...columnConfig} />
+            </div>
+          </div>
+          <div className="rounded-xl border bg-card text-card-foreground shadow">
+            <div className="flex flex-col space-y-1.5 p-6">
+              <h3 className="font-semibold leading-none tracking-tight">合同类型统计</h3>
+            </div>
+            <div className="p-6 pt-0">
+              <Pie {...pieConfig} />
+            </div>
+          </div>
         </div>
       </div>
     </PageContainer>

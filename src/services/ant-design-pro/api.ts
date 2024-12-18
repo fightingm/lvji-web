@@ -64,10 +64,10 @@ export async function rule(
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -75,10 +75,10 @@ export async function updateRule(options?: { [key: string]: any }) {
 export async function addRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -86,9 +86,26 @@ export async function addRule(options?: { [key: string]: any }) {
 export async function removeRule(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
+  });
+}
+
+/** 获取合同列表 GET /api/contract */
+export async function contract(
+  params: {
+    current?: number;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.ContractList>('/api/contract', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
   });
 }

@@ -321,4 +321,48 @@ module.exports = {
     type: 'account',
     currentAuthority: 'admin',
   },
+
+  'GET /api/contract': {
+    data: [
+      {
+        id: 95,
+        name: '曲丽丽',
+        stage: 1,
+        status: 1,
+        created: '2022-12-06T05:00:57.040Z',
+      },
+      {
+        id: 96,
+        name: '曲丽丽22',
+        stage: 2,
+        status: 2,
+        created: '2022-12-06T05:00:57.040Z',
+      },
+      {
+        id: 97,
+        name: '曲丽丽33',
+        stage: 3,
+        status: 3,
+        created: '2022-12-06T05:00:57.040Z',
+      },
+      {
+        id: 98,
+        name: '曲丽丽44',
+        stage: 4,
+        status: 1,
+        created: '2022-12-06T05:00:57.040Z',
+      },
+      {
+        id: 99,
+        name: '曲丽丽55',
+        stage: 5,
+        status: 1,
+        created: '2022-12-06T05:00:57.040Z',
+      },
+    ],
+    total: 100,
+    success: true,
+    pageSize: 20,
+    current: 1,
+  },
 };

@@ -1,8 +1,6 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { addRule, contract, removeRule, updateRule } from '@/services/ant-design-pro/api';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
-  FooterToolbar,
   ModalForm,
   PageContainer,
   ProDescriptions,
@@ -11,7 +9,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -107,118 +105,47 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+  const columns: ProColumns<API.ContractListItem>[] = [
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
-        />
-      ),
+      title: '合同标题',
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
+      render: (dom) => {
+        return <span className="font-medium">{dom}</span>;
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
-      dataIndex: 'desc',
-      valueType: 'textarea',
+      title: '合同阶段',
+      dataIndex: 'stage',
+      search: false,
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleCallNo"
-          defaultMessage="Number of service calls"
-        />
-      ),
-      dataIndex: 'callNo',
-      sorter: true,
-      hideInForm: true,
-      renderText: (val: string) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
+      title: '解析状态',
       dataIndex: 'status',
       hideInForm: true,
+      search: false,
       valueEnum: {
-        0: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
-          ),
-          status: 'Default',
-        },
         1: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
+          text: '进行中',
           status: 'Processing',
         },
         2: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-          ),
+          text: '成功',
           status: 'Success',
         },
         3: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
-          ),
+          text: '失败',
           status: 'Error',
         },
       },
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
-        />
-      ),
-      sorter: true,
-      dataIndex: 'updatedAt',
+      title: '创建时间',
+      dataIndex: 'created',
       valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
-        return defaultRender(item);
-      },
+      search: false,
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
+      title: '操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -229,13 +156,16 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
+          查看
         </a>,
         <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
+          删除
+        </a>,
+        <a key="subscribeAlert" href="https://procomponents.ant.design/">
+          智能审查
+        </a>,
+        <a key="subscribeAlert" href="https://procomponents.ant.design/">
+          合同阶段
         </a>,
       ],
     },
@@ -243,74 +173,57 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.RuleListItem, API.PageParams>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
-        actionRef={actionRef}
-        rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
-        ]}
-        request={rule}
-        columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
-      />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-              &nbsp;&nbsp;
-              <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-              </span>
-            </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
-          <Button type="primary">
-            <FormattedMessage
-              id="pages.searchTable.batchApproval"
-              defaultMessage="Batch approval"
-            />
-          </Button>
-        </FooterToolbar>
-      )}
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-xl border bg-card text-card-foreground shadow sm:col-span-2">
+          <div className="flex flex-col space-y-1.5 p-6 pb-3">
+            <h3 className="font-semibold leading-none tracking-tight">合同管理</h3>
+            <p className="text-sm text-balance max-w-lg leading-relaxed">
+              上传您的合同,在这里完善合同的基本信息.合同文件有更新可以替换合同附件.
+            </p>
+          </div>
+          <div className="flex items-center p-6 pt-0">
+            <Button
+              type="primary"
+              onClick={() => {
+                handleModalOpen(true);
+              }}
+            >
+              上传合同
+            </Button>
+          </div>
+        </div>
+        <div className="rounded-xl border bg-card text-card-foreground shadow">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">本周</p>
+            <h3 className="font-semibold tracking-tight text-4xl">0个</h3>
+          </div>
+          <div className="p-6 pt-0">
+            <div className="text-xs text-muted-foreground">合同即将到期</div>
+          </div>
+        </div>
+        <div className="rounded-xl border bg-card text-card-foreground shadow">
+          <div className="flex flex-col space-y-1.5 p-6 pb-2">
+            <p className="text-sm text-muted-foreground">本月</p>
+            <h3 className="font-semibold tracking-tight text-4xl">0个</h3>
+          </div>
+          <div className="p-6 pt-0">
+            <div className="text-xs text-muted-foreground">合同即将到期</div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4">
+        <ProTable<API.ContractListItem, API.PageParams>
+          headerTitle="合同列表"
+          actionRef={actionRef}
+          rowKey="key"
+          search={{
+            labelWidth: 120,
+          }}
+          request={contract}
+          columns={columns}
+        />
+      </div>
+
       <ModalForm
         title={intl.formatMessage({
           id: 'pages.searchTable.createForm.newRule',

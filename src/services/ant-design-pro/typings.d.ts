@@ -98,4 +98,17 @@ declare namespace API {
     description?: string;
     type?: NoticeIconItemType;
   };
+
+  type ContractListItem = {
+    id: string;
+    name: string;
+    stage: number;
+    status: number;
+    created: string;
+  };
+  type ContractList = {
+    data?: ContractListItem[];
+    total?: number;
+    success?: boolean;
+  };
 }
