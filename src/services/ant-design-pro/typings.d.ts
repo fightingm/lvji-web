@@ -111,4 +111,19 @@ declare namespace API {
     total?: number;
     success?: boolean;
   };
+
+  type AnalysisListItem = {
+    id: string;
+    contract_name: string;
+    file_name: string;
+    contract_party: string;
+    status: string;
+    created_at: string;
+  };
+
+  type AnalysisList = {
+    data?: AnalysisListItem[];
+    total?: number;
+    success?: boolean;
+  };
 }

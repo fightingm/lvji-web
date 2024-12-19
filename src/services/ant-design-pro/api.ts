@@ -109,3 +109,20 @@ export async function contract(
     ...(options || {}),
   });
 }
+
+/** 获取审查结果列表 GET /api/analysis */
+export async function analysis(
+  params: {
+    current?: number;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.AnalysisList>('/api/analysis', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}

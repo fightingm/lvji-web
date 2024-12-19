@@ -117,6 +117,13 @@ const TableList: React.FC = () => {
       title: '合同阶段',
       dataIndex: 'stage',
       search: false,
+      valueEnum: {
+        1: '起草',
+        2: '审核',
+        3: '签订',
+        4: '履约中',
+        5: '已完成',
+      },
     },
     {
       title: '解析状态',
