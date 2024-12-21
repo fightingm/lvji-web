@@ -23,34 +23,12 @@ export default [
     ],
   },
   {
-    path: '/welcome',
-    name: 'welcome',
+    path: '/dashboard',
+    name: 'dashboard',
     icon: 'smile',
-    component: './Welcome',
+    component: './Dashboard',
   },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    routes: [
-      {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
-    ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
+
   {
     name: 'clm.contract',
     icon: 'table',
@@ -67,11 +45,27 @@ export default [
     name: 'clm.config',
     icon: 'table',
     path: '/clm/config',
-    component: './Config',
+    hideChildrenInMenu: true,
+    routes: [
+      {
+        path: '/clm/config',
+        component: './Config',
+      },
+      {
+        path: '/clm/config/strategy-edit/:id',
+        name: 'strategy',
+        component: './Strategy',
+      },
+      {
+        path: '/clm/config/rule-edit/:id',
+        name: 'rule',
+        component: './Rule',
+      },
+    ],
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/dashboard',
   },
   {
     path: '*',

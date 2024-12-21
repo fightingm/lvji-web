@@ -26,6 +26,8 @@ export default {
   'menu.clm.contract': '合同管理',
   'menu.clm.analysis': '审查结果',
   'menu.clm.config': '合同配置',
+  'menu.clm.config.strategy': '修改审核策略',
+  'menu.clm.config.rule': '规则列表',
   'menu.list.basic-list': '标准列表',
   'menu.list.card-list': '卡片列表',
   'menu.list.search-list': '搜索列表',

@@ -1,18 +1,61 @@
-import { addRule, contract, removeRule, updateRule } from '@/services/ant-design-pro/api';
-import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import {
+  addRule,
+  contract,
+  contractDetail,
+  removeContract,
+  updateContract,
+} from '@/services/ant-design-pro/api';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
   ModalForm,
   PageContainer,
-  ProDescriptions,
   ProFormText,
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, Dropdown, Modal, Typography, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import Detail from './components/Detail';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+const { Title, Text } = Typography;
+
+const stages = [
+  {
+    key: '1',
+    label: '起草中',
+  },
+  {
+    key: '2',
+    label: '审核中',
+  },
+  {
+    key: '3',
+    label: '签订完成',
+  },
+  {
+    key: '4',
+    label: '履约中',
+  },
+  {
+    key: '5',
+    label: '纠纷处理中',
+  },
+  {
+    key: '6',
+    label: '已终止',
+  },
+  {
+    key: '7',
+    label: '已到期',
+  },
+  {
+    key: '8',
+    label: '已完成',
+  },
+];
 
 /**
  * @en-US Add node
@@ -33,50 +76,32 @@ const handleAdd = async (fields: API.RuleListItem) => {
   }
 };
 
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
 const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
+  const hide = message.loading('更新中');
+  const { id, ...rest } = fields;
   try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
+    await updateContract(id!, rest);
     hide();
-
-    message.success('Configuration is successful');
+    message.success('修改成功');
     return true;
   } catch (error) {
     hide();
-    message.error('Configuration failed, please try again!');
+    message.error('修改失败，请重试');
     return false;
   }
 };
 
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
+const handleRemove = async (row: API.ContractListItem) => {
   const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
+  if (!row) return true;
   try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
+    await removeContract(row.id);
     hide();
-    message.success('Deleted successfully and will refresh soon');
+    message.success('删除成功');
     return true;
   } catch (error) {
     hide();
-    message.error('Delete failed, please try again');
+    message.error('删除失败，请重试');
     return false;
   }
 };
@@ -87,17 +112,14 @@ const TableList: React.FC = () => {
    * @zh-CN 新建窗口的弹窗
    *  */
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
+
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.ContractListItem>();
+  const [detail, setDetail] = useState<API.ContractListItem>();
 
   /**
    * @en-US International configuration
@@ -105,17 +127,69 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
 
+  function handleDel(row: API.ContractListItem) {
+    Modal.confirm({
+      title: '确认删除合同?',
+      content: '删除合同后将不能再恢复数据.',
+      async onOk() {
+        const success = await handleRemove(row);
+        if (success) {
+          actionRef.current?.reload();
+        }
+      },
+    });
+  }
+
+  async function handleDetail(row: API.ContractListItem) {
+    setShowDetail(true);
+    try {
+      const result = await contractDetail(row.id);
+      setDetail(result);
+    } catch (error) {
+      message.error('查看失败，请重试');
+      setShowDetail(false);
+    }
+  }
+
+  function showUpdate(row: API.ContractListItem) {
+    handleUpdateModalOpen(true);
+    setCurrentRow(row);
+  }
+
+  async function updateConfirm(value) {
+    console.log('xxxx', value);
+    const success = await handleUpdate(value);
+    if (success) {
+      handleUpdateModalOpen(false);
+      setCurrentRow(undefined);
+      if (actionRef.current) {
+        actionRef.current.reload();
+      }
+    }
+  }
+
+  function updateCancel() {
+    handleUpdateModalOpen(false);
+    if (!showDetail) {
+      setCurrentRow(undefined);
+    }
+  }
+
+  function handleStage(row: API.ContractListItem, value: string) {
+    console.log('xxx', row, value);
+  }
+
   const columns: ProColumns<API.ContractListItem>[] = [
     {
       title: '合同标题',
-      dataIndex: 'name',
+      dataIndex: 'contract_name',
       render: (dom) => {
         return <span className="font-medium">{dom}</span>;
       },
     },
     {
       title: '合同阶段',
-      dataIndex: 'stage',
+      dataIndex: 'stage_code',
       search: false,
       valueEnum: {
         1: '起草',
@@ -127,7 +201,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '解析状态',
-      dataIndex: 'status',
+      dataIndex: 'parse_status',
       hideInForm: true,
       search: false,
       valueEnum: {
@@ -147,7 +221,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '创建时间',
-      dataIndex: 'created',
+      dataIndex: 'created_at',
       valueType: 'dateTime',
       search: false,
     },
@@ -156,24 +230,51 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a
-          key="config"
-          onClick={() => {
-            handleUpdateModalOpen(true);
-            setCurrentRow(record);
-          }}
+        <Button
+          key="view"
+          size="small"
+          color="primary"
+          variant="link"
+          onClick={() => handleDetail(record)}
         >
           查看
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
+        </Button>,
+        <Button
+          key="del"
+          size="small"
+          color="danger"
+          variant="link"
+          onClick={() => handleDel(record)}
+        >
           删除
-        </a>,
+        </Button>,
+        <Button
+          key="view"
+          size="small"
+          color="primary"
+          variant="link"
+          onClick={() => showUpdate(record)}
+        >
+          修改
+        </Button>,
         <a key="subscribeAlert" href="https://procomponents.ant.design/">
           智能审查
         </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          合同阶段
-        </a>,
+        <Dropdown
+          key="stage"
+          menu={{
+            items: stages,
+            selectable: true,
+            selectedKeys: [record.stage_code],
+            onSelect(v) {
+              handleStage(record, v.key);
+            },
+          }}
+        >
+          <Button size="small" color="default" variant="link">
+            合同阶段
+          </Button>
+        </Dropdown>,
       ],
     },
   ];
@@ -267,48 +368,27 @@ const TableList: React.FC = () => {
         <ProFormTextArea width="md" name="desc" />
       </ModalForm>
       <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-          if (success) {
-            handleUpdateModalOpen(false);
-            setCurrentRow(undefined);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalOpen(false);
-          if (!showDetail) {
-            setCurrentRow(undefined);
-          }
-        }}
-        updateModalOpen={updateModalOpen}
+        onSubmit={updateConfirm}
+        onCancel={updateCancel}
+        visible={updateModalOpen}
         values={currentRow || {}}
       />
 
       <Drawer
-        width={600}
+        width={400}
+        styles={{
+          body: {
+            padding: '0',
+          },
+        }}
         open={showDetail}
         onClose={() => {
-          setCurrentRow(undefined);
           setShowDetail(false);
+          setDetail(undefined);
         }}
         closable={false}
       >
-        {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
-            column={2}
-            title={currentRow?.name}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.name,
-            }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
-          />
-        )}
+        {detail && <Detail data={detail} />}
       </Drawer>
     </PageContainer>
   );

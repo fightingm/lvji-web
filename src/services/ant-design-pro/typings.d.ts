@@ -99,12 +99,27 @@ declare namespace API {
     type?: NoticeIconItemType;
   };
 
-  type ContractListItem = {
+  type File = {
     id: string;
     name: string;
-    stage: number;
-    status: number;
-    created: string;
+  };
+
+  type ContractListItem = {
+    id: string;
+    amount: string;
+    contract_name: string;
+    stage_code: string;
+    parse_status: string;
+    created_at: string;
+    contract_type: string;
+    start_date: string;
+    end_date: string;
+    file_list: File[];
+    parties: {
+      party_a: string;
+      party_b: string;
+      party_c: string;
+    };
   };
   type ContractList = {
     data?: ContractListItem[];

@@ -110,6 +110,27 @@ export async function contract(
   });
 }
 
+export async function contractDetail(id: string) {
+  return request<API.ContractListItem>(`/api/contract/${id}`, {
+    method: 'GET',
+  });
+}
+
+export async function updateContract(id: string, options?: { [key: string]: any }) {
+  return request(`/api/contract/${id}`, {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function removeContract(id: string) {
+  return request<Record<string, any>>(`/api/contract/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 /** 获取审查结果列表 GET /api/analysis */
 export async function analysis(
   params: {

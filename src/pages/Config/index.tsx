@@ -1,11 +1,31 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
+import { Link } from '@umijs/max';
 import { Button, Card, Input, List, Segmented, Typography } from 'antd';
 import React, { useState } from 'react';
 
 const { Title, Text } = Typography;
 
 const data = [
+  {
+    title: '一个策略',
+    desc: '哈哈哈',
+  },
+  {
+    title: '两个策略',
+    desc: '哈哈哈',
+  },
+  {
+    title: '三个策略',
+    desc: '哈哈哈',
+  },
+  {
+    title: '四个策略',
+    desc: '哈哈哈',
+  },
+];
+
+const rules = [
   {
     title: '通用合同',
   },
@@ -53,8 +73,11 @@ const TableList: React.FC = () => {
               renderItem={(item) => (
                 <List.Item>
                   <Card title={item.title}>
-                    <div className="flex justify-end">
-                      <Button>配置规则</Button>
+                    <div className="text-sm">{item.desc}</div>
+                    <div className="mt-2 flex justify-end">
+                      <Button>
+                        <Link to="/clm/config/strategy-edit/222">配置策略</Link>
+                      </Button>
                     </div>
                   </Card>
                 </List.Item>
@@ -70,6 +93,23 @@ const TableList: React.FC = () => {
             <Button icon={<PlusOutlined />} iconPosition="start">
               新增规则集
             </Button>
+          </div>
+          <div className="mt-4">
+            <List
+              grid={{ gutter: 16, column: 3 }}
+              dataSource={rules}
+              renderItem={(item) => (
+                <List.Item>
+                  <Card title={item.title}>
+                    <div className="flex justify-end">
+                      <Button>
+                        <Link to="/clm/config/rule-edit/222">配置规则</Link>
+                      </Button>
+                    </div>
+                  </Card>
+                </List.Item>
+              )}
+            />
           </div>
         </>
       )}

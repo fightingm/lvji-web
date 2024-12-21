@@ -322,50 +322,6 @@ module.exports = {
     currentAuthority: 'admin',
   },
 
-  'GET /api/contract': {
-    data: [
-      {
-        id: 95,
-        name: '劳 动 合 同 1',
-        stage: 1,
-        status: 1,
-        created: '2022-12-06T05:00:57.040Z',
-      },
-      {
-        id: 96,
-        name: '劳 动 合 同 2',
-        stage: 2,
-        status: 2,
-        created: '2022-12-06T05:00:57.040Z',
-      },
-      {
-        id: 97,
-        name: '劳 动 合 同 3',
-        stage: 3,
-        status: 3,
-        created: '2022-12-06T05:00:57.040Z',
-      },
-      {
-        id: 98,
-        name: '劳 动 合 同 4',
-        stage: 4,
-        status: 1,
-        created: '2022-12-06T05:00:57.040Z',
-      },
-      {
-        id: 99,
-        name: '劳 动 合 同 5',
-        stage: 5,
-        status: 1,
-        created: '2022-12-06T05:00:57.040Z',
-      },
-    ],
-    total: 100,
-    success: true,
-    pageSize: 20,
-    current: 1,
-  },
-
   'GET /api/analysis': {
     data: [
       {
