@@ -13,7 +13,7 @@ export default function Detail(props: { data: API.ContractListItem }) {
   return (
     <div>
       <div className="p-6 bg-[#f4f4f5]">
-        <Title level={3}>{data.contract_name}</Title>
+        <Title level={4}>{data.contract_name}</Title>
         <Text>创建日期：{data.created_at}</Text>
       </div>
       <div className="p-6">

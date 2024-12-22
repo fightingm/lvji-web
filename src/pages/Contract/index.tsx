@@ -14,48 +14,12 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Dropdown, Modal, Typography, message } from 'antd';
+import { Button, Drawer, Modal, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import Detail from './components/Detail';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-
-const { Title, Text } = Typography;
-
-const stages = [
-  {
-    key: '1',
-    label: '起草中',
-  },
-  {
-    key: '2',
-    label: '审核中',
-  },
-  {
-    key: '3',
-    label: '签订完成',
-  },
-  {
-    key: '4',
-    label: '履约中',
-  },
-  {
-    key: '5',
-    label: '纠纷处理中',
-  },
-  {
-    key: '6',
-    label: '已终止',
-  },
-  {
-    key: '7',
-    label: '已到期',
-  },
-  {
-    key: '8',
-    label: '已完成',
-  },
-];
+import { Radar } from '@ant-design/charts';
 
 /**
  * @en-US Add node
@@ -157,7 +121,6 @@ const TableList: React.FC = () => {
   }
 
   async function updateConfirm(value) {
-    console.log('xxxx', value);
     const success = await handleUpdate(value);
     if (success) {
       handleUpdateModalOpen(false);
@@ -173,10 +136,6 @@ const TableList: React.FC = () => {
     if (!showDetail) {
       setCurrentRow(undefined);
     }
-  }
-
-  function handleStage(row: API.ContractListItem, value: string) {
-    console.log('xxx', row, value);
   }
 
   const columns: ProColumns<API.ContractListItem>[] = [
@@ -257,24 +216,15 @@ const TableList: React.FC = () => {
         >
           修改
         </Button>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          智能审查
-        </a>,
-        <Dropdown
-          key="stage"
-          menu={{
-            items: stages,
-            selectable: true,
-            selectedKeys: [record.stage_code],
-            onSelect(v) {
-              handleStage(record, v.key);
-            },
-          }}
+        <Button
+          key="check"
+          size="small"
+          color="primary"
+          variant="link"
+          onClick={() => showUpdate(record)}
         >
-          <Button size="small" color="default" variant="link">
-            合同阶段
-          </Button>
-        </Dropdown>,
+          智能审查
+        </Button>,
       ],
     },
   ];
@@ -390,6 +340,7 @@ const TableList: React.FC = () => {
       >
         {detail && <Detail data={detail} />}
       </Drawer>
+      <Radar />
     </PageContainer>
   );
 };

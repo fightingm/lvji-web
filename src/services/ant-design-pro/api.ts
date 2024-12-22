@@ -147,3 +147,60 @@ export async function analysis(
     ...(options || {}),
   });
 }
+
+export async function analysisDetail(id: string) {
+  return request<API.AnalysisListItem>(`/api/analysis/${id}`, {
+    method: 'GET',
+  });
+}
+
+/**
+ * 合同类型列表
+ */
+export async function contractTypeList() {
+  return request<API.ContractTypeList>('/api/contract_type/list', {
+    method: 'GET',
+  });
+}
+
+/**
+ * 获取策略列表
+ */
+export async function strategyList() {
+  return request<API.StrategyList>('/api/strategy/list', {
+    method: 'GET',
+  });
+}
+
+/**
+ * 获取规则列表
+ */
+export async function scenarioList() {
+  return request<API.ScenarioList>('/api/scenario/list', {
+    method: 'GET',
+  });
+}
+
+/**
+ * 新增策略
+ */
+export async function strategyAdd(options?: { [key: string]: any }) {
+  return request('/api/scenario/add', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+/**
+ * 新增规则
+ */
+export async function scenarioAdd(options?: { [key: string]: any }) {
+    return request('/api/scenario/add', {
+      method: 'POST',
+      data: {
+        ...(options || {}),
+      },
+    });
+  }

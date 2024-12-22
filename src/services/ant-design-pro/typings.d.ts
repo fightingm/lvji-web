@@ -127,6 +127,15 @@ declare namespace API {
     success?: boolean;
   };
 
+  type ContractType = {
+    id: string;
+    contract_type: string;
+  };
+
+  type ContractTypeList = {
+    data?: ContractType[];
+  };
+
   type AnalysisListItem = {
     id: string;
     contract_name: string;
@@ -134,11 +143,36 @@ declare namespace API {
     contract_party: string;
     status: string;
     created_at: string;
+    review_conclusion: string;
+    finish_time: string;
+    review_score: Array<{
+      score: number;
+      type: string;
+    }>;
   };
 
   type AnalysisList = {
     data?: AnalysisListItem[];
     total?: number;
     success?: boolean;
+  };
+
+  type StrategyItem = {
+    id: string;
+    strategy_name: string;
+    strategy_desc: string;
+  };
+
+  type StrategyList = {
+    data?: StrategyItem[];
+  };
+
+  type ScenarioItem = {
+    id: string;
+    scenario_name: string;
+  };
+
+  type ScenarioList = {
+    data?: ScenarioItem[];
   };
 }

@@ -1,16 +1,22 @@
-import { addRule, analysis, removeRule, updateRule } from '@/services/ant-design-pro/api';
-import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import {
+  addRule,
+  analysis,
+  analysisDetail,
+  removeRule,
+  updateRule,
+} from '@/services/ant-design-pro/api';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
   ModalForm,
   PageContainer,
-  ProDescriptions,
   ProFormText,
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Drawer, message } from 'antd';
+import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
+import Detail from './components/Detail';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 
@@ -96,14 +102,27 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.AnalysisListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.AnalysisListItem[]>([]);
+
+  const [detail, setDetail] = useState<API.AnalysisListItem>();
 
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+
+  async function handleDetail(row: API.AnalysisListItem) {
+    setShowDetail(true);
+    try {
+      const result = await analysisDetail(row.id);
+      setDetail(result);
+    } catch (error) {
+      message.error('查看失败，请重试');
+      setShowDetail(false);
+    }
+  }
 
   const columns: ProColumns<API.AnalysisListItem>[] = [
     {
@@ -154,21 +173,33 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a
-          key="config"
-          onClick={() => {
-            handleUpdateModalOpen(true);
-            setCurrentRow(record);
-          }}
+        <Button
+          key="view"
+          size="small"
+          color="primary"
+          variant="link"
+          onClick={() => handleDetail(record)}
         >
           查看
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
+        </Button>,
+        <Button
+          key="report"
+          size="small"
+          color="primary"
+          variant="link"
+          onClick={() => handleDetail(record)}
+        >
           查看报告
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
+        </Button>,
+        <Button
+          key="export"
+          size="small"
+          color="primary"
+          variant="link"
+          onClick={() => handleDetail(record)}
+        >
           导出报告
-        </a>,
+        </Button>,
       ],
     },
   ];
@@ -273,7 +304,12 @@ const TableList: React.FC = () => {
       />
 
       <Drawer
-        width={600}
+        width={400}
+        styles={{
+          body: {
+            padding: '0',
+          },
+        }}
         open={showDetail}
         onClose={() => {
           setCurrentRow(undefined);
@@ -281,19 +317,7 @@ const TableList: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
-            column={2}
-            title={currentRow?.name}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.name,
-            }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
-          />
-        )}
+        {detail && <Detail data={detail} />}
       </Drawer>
     </PageContainer>
   );
