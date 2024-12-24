@@ -110,4 +110,7 @@ export default {
       },
     ],
   },
+  'POST /api/contract/upload': {
+    success: true,
+  },
 };

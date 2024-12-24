@@ -197,10 +197,25 @@ export async function strategyAdd(options?: { [key: string]: any }) {
  * 新增规则
  */
 export async function scenarioAdd(options?: { [key: string]: any }) {
-    return request('/api/scenario/add', {
-      method: 'POST',
-      data: {
-        ...(options || {}),
-      },
-    });
+  return request('/api/scenario/add', {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+/**
+ * 上传文件
+ */
+export async function uploadContract(file: File) {
+  const formData = new FormData();
+  if (file) {
+    formData.append('file', file);
   }
+  return request('/api/contract/upload', {
+    method: 'POST',
+    data: formData,
+    requestType: 'form',
+  });
+}

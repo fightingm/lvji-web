@@ -4,22 +4,22 @@ import {
   contractDetail,
   removeContract,
   updateContract,
+  uploadContract,
 } from '@/services/ant-design-pro/api';
+import { Radar } from '@ant-design/charts';
+import { InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import {
-  ModalForm,
-  PageContainer,
-  ProFormText,
-  ProFormTextArea,
-  ProTable,
-} from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Modal, message } from 'antd';
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
+import { Button, Drawer, GetProp, Modal, Upload, UploadFile, UploadProps, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import Detail from './components/Detail';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import { Radar } from '@ant-design/charts';
+
+const { Dragger } = Upload;
+
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
 /**
  * @en-US Add node
@@ -71,11 +71,7 @@ const handleRemove = async (row: API.ContractListItem) => {
 };
 
 const TableList: React.FC = () => {
-  /**
-   * @en-US Pop-up window of new window
-   * @zh-CN 新建窗口的弹窗
-   *  */
-  const [createModalOpen, handleModalOpen] = useState<boolean>(false);
+  const [uploadModalVisible, setUploadModalVisible] = useState<boolean>(false);
 
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
 
@@ -120,7 +116,7 @@ const TableList: React.FC = () => {
     setCurrentRow(row);
   }
 
-  async function updateConfirm(value) {
+  async function updateConfirm(value: API.ContractListItem) {
     const success = await handleUpdate(value);
     if (success) {
       handleUpdateModalOpen(false);
@@ -229,6 +225,44 @@ const TableList: React.FC = () => {
     },
   ];
 
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadProps: UploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList([...fileList, file]);
+
+      return false;
+    },
+    onChange(files) {
+      setFileList([...files.fileList]);
+    },
+    fileList,
+  };
+
+  const handleUpload = () => {
+    setUploading(true);
+    const fileRequest = fileList.map((item) => uploadContract(item as unknown as File));
+    Promise.all(fileRequest)
+      .then(() => {
+        setFileList([]);
+        message.success('上传成功');
+        setUploadModalVisible(false);
+      })
+      .catch(() => {
+        message.error('上传失败，请重试');
+      })
+      .finally(() => {
+        setUploading(false);
+      });
+  };
+
   return (
     <PageContainer>
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
@@ -243,7 +277,7 @@ const TableList: React.FC = () => {
             <Button
               type="primary"
               onClick={() => {
-                handleModalOpen(true);
+                setUploadModalVisible(true);
               }}
             >
               上传合同
@@ -277,46 +311,31 @@ const TableList: React.FC = () => {
           search={{
             labelWidth: 120,
           }}
+          toolbar={{ settings: undefined }}
           request={contract}
           columns={columns}
         />
       </div>
 
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
-        width="400px"
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
+      <Modal
+        title="上传合同"
+        width={600}
+        open={uploadModalVisible}
+        onOk={handleUpload}
+        onCancel={() => setUploadModalVisible(false)}
       >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
+        <div className="py-4">
+          <Dragger {...uploadProps} multiple>
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined />
+            </p>
+            <p className="text-base font-medium text-[#71717a]">
+              在这里拖拽多个文件或者点击上传文件
+            </p>
+            <p className="text-[#71717a]/75 text-sm">你可以上传 10 个文件 (最大 10 MB 每个)</p>
+          </Dragger>
+        </div>
+      </Modal>
       <UpdateForm
         onSubmit={updateConfirm}
         onCancel={updateCancel}

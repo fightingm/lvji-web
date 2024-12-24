@@ -210,7 +210,7 @@ const TableList: React.FC = () => {
         <div className="rounded-xl border bg-card text-card-foreground shadow sm:col-span-2">
           <div className="flex flex-col space-y-1.5 p-6 pb-3">
             <h3 className="font-semibold leading-none tracking-tight">合同分析</h3>
-            <p className="text-sm text-balance max-w-lg leading-relaxed">
+            <p className="text-sm leading-relaxed">
               在这里查看您的合同分析审查结果,可查看分析结果、合同评分、导出审查报告.
             </p>
           </div>
@@ -242,6 +242,7 @@ const TableList: React.FC = () => {
           search={{
             labelWidth: 120,
           }}
+          toolbar={{ settings: undefined }}
           request={analysis}
           columns={columns}
         />
