@@ -57,6 +57,11 @@ export default [
         component: './Strategy',
       },
       {
+        path: '/clm/config/strategy-add',
+        name: 'strategyAdd',
+        component: './StrategyAdd',
+      },
+      {
         path: '/clm/config/rule-edit/:id',
         name: 'rule',
         component: './Rule',

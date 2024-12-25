@@ -66,7 +66,7 @@ const TableList: React.FC = () => {
           <div className="mt-4 flex items-center justify-between">
             <Input className="w-[300px]" placeholder="输入配置名称搜索..." />
             <Button icon={<PlusOutlined />} iconPosition="start">
-              新增策略
+              <Link to="/clm/config/strategy-add">新增策略</Link>
             </Button>
           </div>
           <div className="mt-4">
