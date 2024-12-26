@@ -181,6 +181,15 @@ export async function scenarioList() {
   });
 }
 
+export async function ruleList(id: string) {
+  return request<API.RuleList>('/api/rule/list', {
+    method: 'GET',
+    params: {
+      id,
+    },
+  });
+}
+
 /**
  * 新增策略
  */
