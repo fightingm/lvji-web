@@ -1,3 +1,5 @@
+import { RuleFormItem } from '@/components/RuleFormItem';
+import { strategyDetail, strategyUpdate } from '@/services/ant-design-pro/api';
 import { PlusOutlined, SettingOutlined } from '@ant-design/icons';
 import {
   PageContainer,
@@ -6,58 +8,11 @@ import {
   ProFormTextArea,
   useControlModel,
 } from '@ant-design/pro-components';
-import { useNavigate } from '@umijs/max';
-import { Button, Form, Space, Table, Tag, Typography } from 'antd';
-import React, { useRef, useState } from 'react';
+import { useNavigate, useParams, useRequest } from '@umijs/max';
+import { Button, Form, Space, Table, Tag, Typography, message } from 'antd';
+import React, { useRef } from 'react';
 
 const { Title, Text } = Typography;
-
-const initValue = {
-  id: '35202700-88ab-423c-aa22-4594640084da',
-  strategy_name: '测试一下',
-  strategy_desc: '茶话会',
-  created_by: 'c5c61b26bd73472583e443b3dd9ecc6c',
-  created_at: '2024-12-20 00:29:27',
-  updated_at: '2024-12-20 00:29:27',
-  rule_list: [
-    {
-      id: '3d22c772-30e4-45b8-bc1c-88122ed952c8',
-      scenario_id: '05a0752e-a8e6-4c51-b1b8-4d4e489525a1',
-      rule_name: '隐瞒财产',
-      rule_type_id: 2,
-      rule_desc: '审查是否存在一方隐瞒财产的情况，是否有相应的惩罚措施。',
-      risk_level: 'MEDIUM',
-      is_deleted: false,
-      created_by: 'system',
-      created_at: '2024-08-27 23:43:50',
-      rule_type: '审查该合同类型特有的风险 ',
-    },
-    {
-      id: '15ce6e2f-5592-4c70-9090-2ee72ec7de33',
-      scenario_id: '05a0752e-a8e6-4c51-b1b8-4d4e489525a1',
-      rule_name: '违约责任',
-      rule_type_id: 2,
-      rule_desc: '审查违约责任条款是否明确，是否合理，是否有利于保障双方的合法权益。',
-      risk_level: 'HIGH',
-      is_deleted: false,
-      created_by: 'system',
-      created_at: '2024-08-27 23:43:50',
-      rule_type: '审查该合同类型特有的风险 ',
-    },
-    {
-      id: '0c5a924a-5d1e-4e27-b680-a2c75a86c5c5',
-      scenario_id: '05a0752e-a8e6-4c51-b1b8-4d4e489525a1',
-      rule_name: '协议履行保障',
-      rule_type_id: 2,
-      rule_desc: '审查是否有保障协议履行的措施，如财产担保等。',
-      risk_level: 'MEDIUM',
-      is_deleted: false,
-      created_by: 'system',
-      created_at: '2024-08-27 23:43:50',
-      rule_type: '审查该合同类型特有的风险 ',
-    },
-  ],
-};
 
 function PriceInput(props) {
   const { value = [], onChange } = useControlModel(props);
@@ -114,24 +69,54 @@ function PriceInput(props) {
 }
 
 const TableList: React.FC = () => {
-  const [tab, setTab] = useState(0);
+  const params = useParams();
   const formRef = useRef();
 
   const navigate = useNavigate();
+
+  const { run, loading } = useRequest(strategyUpdate, {
+    manual: true,
+    onSuccess() {
+      message.success('修改成功');
+      navigate(-1);
+    },
+    onError() {
+      message.error('修改失败，请重试');
+    },
+  });
+
+  function submit(values) {
+    if (!params.id) {
+      return;
+    }
+    return run(params.id, {
+      ...values,
+      rule_list: values.rule_list.map((item) => item.id),
+    });
+  }
+
+  if (!params.id) {
+    return null;
+  }
+
   return (
     <PageContainer>
       <Text type="secondary">审核策略由一组审核规则构成.</Text>
       <div className="mt-4">
         <ProForm
-          onFinish={async (values) => {
-            console.log(values);
+          request={async () => {
+            const res = await strategyDetail(params.id!);
+            return res.data;
           }}
+          onFinish={submit}
           formRef={formRef}
-          initialValues={initValue}
           submitter={{
             searchConfig: {
               resetText: '取消',
               submitText: '修改',
+            },
+            submitButtonProps: {
+              loading,
             },
             resetButtonProps: {
               style: {
@@ -147,7 +132,7 @@ const TableList: React.FC = () => {
           <ProFormTextArea colProps={{ span: 24 }} name="strategy_desc" label="审核策略描述" />
 
           <Form.Item name="rule_list" label="审查规则">
-            <PriceInput />
+            <RuleFormItem />
           </Form.Item>
         </ProForm>
       </div>

@@ -1,4 +1,4 @@
-import { scenarioList, strategyAdd, strategyList } from '@/services/ant-design-pro/api';
+import { scenarioAdd, scenarioList, strategyList } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Link, useRequest } from '@umijs/max';
@@ -22,7 +22,7 @@ const tabs = [
 const handleAdd = async (fields: FormValueType) => {
   const hide = message.loading('新增中');
   try {
-    await strategyAdd(fields);
+    await scenarioAdd(fields);
     hide();
     message.success('新增成功');
     return true;

@@ -194,11 +194,29 @@ export async function ruleList(id: string) {
  * 新增策略
  */
 export async function strategyAdd(options?: { [key: string]: any }) {
-  return request('/api/scenario/add', {
+  return request('/api/strategy/add', {
     method: 'POST',
     data: {
       ...(options || {}),
     },
+  });
+}
+
+/**
+ * 修改策略
+ */
+export async function strategyUpdate(id: string, options?: { [key: string]: any }) {
+  return request(`/api/strategy/${id}`, {
+    method: 'POST',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
+
+export async function strategyDetail(id: string) {
+  return request<API.StrategyItem>(`/api/strategy/${id}`, {
+    method: 'GET',
   });
 }
 

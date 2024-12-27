@@ -27,41 +27,49 @@ export default {
     pageSize: 20,
     current: 1,
   },
-  'GET /api/analysis/:id': {
-    id: '1c020981-ae04-4ac1-b306-2e90b0ae9752',
-    review_conclusion: '合同内容较为全面，符合中国法律规定，但需注意部分条款的具体执行。',
-    finish_time: '2024-12-19 00:03:55',
-    review_score: [
-      {
-        score: 90,
-        type: '合法性',
-      },
-      {
-        score: 80,
-        type: '合规性',
-      },
-      {
-        score: 90,
-        type: '成本效益',
-      },
-      {
-        score: 90,
-        type: '完整性',
-      },
-      {
-        score: 90,
-        type: '清晰度',
-      },
-      {
-        score: 90,
-        type: '风险',
-      },
-    ],
+  'GET /api/strategy/:id': {
+    data: {
+      id: '1c020981-ae04-4ac1-b306-2e90b0ae9752',
+      strategy_desc: '合同内容较为全面，符合中国法律规定，但需注意部分条款的具体执行。',
+      strategy_name: '合同内容',
+      rule_list: [
+        {
+          id: '1111',
+          rule_name: '明确合同',
+          rule_desc: '明确合同履行的各关键节点时间、具体条件等，确保',
+          created_by: 'system',
+          risk_level: 'MEDIUM',
+          rule_type: '审查通用条款的常见风险 ',
+          rule_type_id: 4,
+        },
+        {
+          id: '2222',
+          rule_name: '履行期限',
+          rule_desc: '明确合同履行的各关键节点时间、具体条件等，确保',
+          created_by: 'system',
+          risk_level: 'MEDIUM',
+          rule_type: '审查通用条款的常见风险 ',
+          rule_type_id: 4,
+        },
+        {
+          id: '3333',
+          rule_name: '关键节点',
+          rule_desc: '明确合同履行的各关键节点时间、具体条件等，确保',
+          created_by: 'system',
+          risk_level: 'MEDIUM',
+          rule_type: '审查通用条款的常见风险 ',
+          rule_type_id: 4,
+        },
+      ],
+    },
   },
   'DELETE /api/analysis/:id': {
     success: true,
   },
-  'POST /api/analysis/:id': {
+  'POST /api/strategy/:id': {
+    success: true,
+  },
+  'POST /api/strategy/add': {
     success: true,
   },
 };
