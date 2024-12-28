@@ -40,6 +40,7 @@ declare namespace API {
     rule_desc?: string;
     created_by?: string;
     risk_level?: string;
+    rule_type?: string;
   };
 
   type RuleList = {
@@ -47,6 +48,14 @@ declare namespace API {
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
+  };
+
+  type RuleTypeItem = {
+    id: string;
+    rule_type?: string;
+  };
+  type RuleTypeList = {
+    data?: RuleTypeItem[];
   };
 
   type FakeCaptcha = {

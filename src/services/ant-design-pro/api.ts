@@ -60,12 +60,11 @@ export async function rule(
   });
 }
 
-/** 更新规则 PUT /api/rule */
-export async function updateRule(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/rule', {
+/** 更新规则 /api/rule */
+export async function updateRule(id: string, options?: { [key: string]: any }) {
+  return request(`/api/rule/${id}`, {
     method: 'POST',
     data: {
-      method: 'update',
       ...(options || {}),
     },
   });
@@ -73,21 +72,9 @@ export async function updateRule(options?: { [key: string]: any }) {
 
 /** 新建规则 POST /api/rule */
 export async function addRule(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/rule', {
+  return request('/api/rule_add', {
     method: 'POST',
     data: {
-      method: 'post',
-      ...(options || {}),
-    },
-  });
-}
-
-/** 删除规则 DELETE /api/rule */
-export async function removeRule(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/rule', {
-    method: 'POST',
-    data: {
-      method: 'delete',
       ...(options || {}),
     },
   });
@@ -181,12 +168,33 @@ export async function scenarioList() {
   });
 }
 
+/**
+ * 某个规则集的全部规则
+ */
 export async function ruleList(id: string) {
   return request<API.RuleList>('/api/rule/list', {
     method: 'GET',
     params: {
       id,
     },
+  });
+}
+
+/**
+ * 删除规则
+ */
+export async function removeRule(id: string) {
+  return request<Record<string, any>>(`/api/rule/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+/**
+ * 规则类型列表
+ */
+export async function ruleTypeList() {
+  return request<API.RuleTypeList>('/api/rule_type/list', {
+    method: 'GET',
   });
 }
 

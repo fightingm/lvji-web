@@ -15,23 +15,12 @@ export type FormValueType = {
   frequency?: string;
 } & Partial<API.RuleListItem>;
 
-export type UpdateFormProps = {
+export type AddFormProps = {
   onCancel: () => void;
   onSubmit: (values: FormValueType) => Promise<void>;
   visible: boolean;
   values: Partial<API.RuleListItem>;
   types: API.RuleTypeItem[];
-};
-
-const stageMap = {
-  '1': '起草中',
-  '2': '审核中',
-  '3': '签订完成',
-  '4': '履约中',
-  '5': '纠纷处理中',
-  '6': '已终止',
-  '7': '已到期',
-  '8': '已完成',
 };
 
 const riskList = [
@@ -49,7 +38,7 @@ const riskList = [
   },
 ];
 
-const UpdateForm: React.FC<UpdateFormProps> = (props) => {
+const AddForm: React.FC<AddFormProps> = (props) => {
   function handleSubmit(fields: FormValueType) {
     return props.onSubmit({
       ...props.values,
@@ -77,4 +66,4 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   );
 };
 
-export default UpdateForm;
+export default AddForm;
