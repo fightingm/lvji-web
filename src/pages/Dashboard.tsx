@@ -199,10 +199,10 @@ const Welcome: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="rounded-xl border bg-card text-card-foreground shadow">
+        <div className="rounded-xl border shadow">
           <div className="flex flex-col space-y-1.5 p-6">
             <h3 className="font-semibold leading-none tracking-tight">合同审查统计</h3>
-            <p className="text-sm text-muted-foreground">12月</p>
+            <p className="text-sm">12月</p>
           </div>
           <Line {...config} />
         </div>

@@ -33,7 +33,21 @@ export default [
     name: 'clm.contract',
     icon: 'table',
     path: '/clm/contract',
-    component: './Contract',
+    hideChildrenInMenu: true,
+    routes: [
+      {
+        path: '/clm/contract',
+        component: './Contract',
+      },
+      {
+        path: '/clm/contract/step',
+        component: './ContractStep',
+      },
+      {
+        path: '/clm/contract/detail',
+        component: './ContractDetail',
+      },
+    ],
   },
   {
     name: 'clm.analysis',
