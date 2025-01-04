@@ -1,3 +1,10 @@
+import {
+  CopyOutlined,
+  DownOutlined,
+  FileDoneOutlined,
+  ProfileOutlined,
+  PushpinOutlined,
+} from '@ant-design/icons';
 import { Button, Collapse } from 'antd';
 import { useMemo, useState } from 'react';
 
@@ -27,12 +34,76 @@ function Quote({ text }) {
   );
 }
 
-function Item({ text }) {
+const mockData = {
+  text,
+  basis: [
+    {
+      tag: '签署条款',
+      title: '缺少签署地点的具体约定',
+      desc: '合同中未明确签署地点，建议明确到区一级，如本合同由甲乙双方签署于成都市武侯区，以避免未来可能产生的地域管辖争议。',
+    },
+    {
+      tag: '标的质量',
+      title: '标的质量标准不够具体明确',
+      desc: '虽然合同中提到乙方需按时、按质、按量地完成工作任务，并需达到甲方的工作要求，但具体的‘质’和‘量’的标准并未详细列出，这可能导致在实际操作中难以衡量乙方的工作是否符合标准，从而引发争议。',
+    },
+  ],
+};
+
+function Item({ data }) {
+  const { text, basis } = data;
+  const [expand, setExpand] = useState(true);
   return (
     <>
       <Quote text={text} />
       <div className="mt-2 p-4 rounded-md bg-gradient-to-br from-[#f2fbf7] to-[#f1f4fd]">
         {text}
+      </div>
+      <div className="mt-4 flex items-center gap-2">
+        <div className="flex items-center gap-1 cursor-pointer hover:text-[#009e59]">
+          <PushpinOutlined style={{ color: '#009e59' }} />
+          <span>定位到原文</span>
+        </div>
+        <div className="flex items-center gap-1 cursor-pointer hover:text-[#009e59]">
+          <CopyOutlined style={{ color: '#009e59' }} />
+          <span>复制修改建议</span>
+        </div>
+        <div className="ml-auto flex items-center gap-1 cursor-pointer">
+          <Button icon={<FileDoneOutlined style={{ color: '#009e59' }} />}>接受修订</Button>
+        </div>
+      </div>
+      <div className="mt-4">
+        <div
+          className="flex gap-2 items-center cursor-pointer"
+          onClick={() => setExpand((v) => !v)}
+        >
+          <span className="font-bold">审查依据</span>
+          <DownOutlined rotate={expand ? 0 : -90} style={{ fontSize: 12 }} />
+        </div>
+        <div className="mt-2">
+          <div className="flex flex-wrap gap-2">
+            {basis.map((item, index) => {
+              if (expand) {
+                return (
+                  <div key={index} className="w-full border p-4 rounded-lg">
+                    <div className="inline-flex items-center gap-1 border px-2 py-1 rounded-2xl">
+                      <ProfileOutlined style={{ color: '#009e59' }} />
+                      <span>{item.tag}</span>
+                    </div>
+                    <div className="font-bold mt-2">{item.title}</div>
+                    <div className="text-[#4e5969] mt-2">{item.desc}</div>
+                  </div>
+                );
+              }
+              return (
+                <div key={index} className="flex items-center gap-1 border px-2 py-1 rounded-2xl">
+                  <ProfileOutlined style={{ color: '#009e59' }} />
+                  <span>{item.tag}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </>
   );
@@ -41,7 +112,7 @@ const items = [
   {
     key: '1',
     label: 'This is panel header 1',
-    children: <Item text={text} />,
+    children: <Item data={mockData} />,
     style: panelStyle,
   },
   {

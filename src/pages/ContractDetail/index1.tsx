@@ -1,6 +1,7 @@
 import { PageContainer } from '@ant-design/pro-components';
+import Editor from '@hufe921/canvas-editor';
+import docxPlugin from '@hufe921/canvas-editor-plugin-docx';
 import { Tabs, TabsProps } from 'antd';
-import { renderAsync } from 'docx-preview';
 import React, { useEffect, useState } from 'react';
 import AllTab from './components/AllTab';
 import Loading from './components/Loading';
@@ -37,7 +38,19 @@ const TableList: React.FC = () => {
         return res.arrayBuffer();
       })
       .then((data) => {
-        return renderAsync(data, document.getElementById('docx') as HTMLElement);
+        const instance = new Editor(document.getElementById('docx') as HTMLDivElement, {
+          main: [{ value: '' }],
+        });
+        instance.use(docxPlugin);
+
+        instance.command.executeImportDocx({
+          arrayBuffer: data,
+        });
+
+        // instance.executeExportDocx({
+        // fileName: string,
+        // });
+        // return renderAsync(data, document.getElementById('docx') as HTMLElement);
       })
       .catch(function (error) {
         console.log('xxxx', error);
@@ -48,10 +61,7 @@ const TableList: React.FC = () => {
     <PageContainer>
       <div className="flex">
         <div className="flex-1 border bg-white">
-          <div
-            id="docx"
-            className="[&_>.docx-wrapper]:p-0 [&_>.docx-wrapper]:bg-transparent h-screen overflow-auto"
-          ></div>
+          <div id="docx" className=" h-screen overflow-auto"></div>
         </div>
         <div className="shrink-0 w-[500px] px-2 h-screen overflow-hidden">
           <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0 h-full [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
