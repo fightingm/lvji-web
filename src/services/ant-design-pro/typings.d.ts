@@ -163,7 +163,7 @@ declare namespace API {
   type StrategyItem = {
     id: string;
     name: string;
-    strategy_desc: string;
+    description: string;
   };
 
   type StrategyList = {

@@ -221,10 +221,19 @@ export async function ruleTypeList() {
  * 新增策略
  */
 export async function strategyAdd(options?: { [key: string]: any }) {
-  return request('/api/strategy/add', {
+  return request('/api/rule-service/addStrategy', {
     method: 'POST',
     data: {
       ...(options || {}),
+    },
+  });
+}
+
+export async function removeStrategy(id: string) {
+  return request('/api/rule-service/deleteStrategy', {
+    method: 'DELETE',
+    params: {
+      id,
     },
   });
 }
@@ -232,9 +241,9 @@ export async function strategyAdd(options?: { [key: string]: any }) {
 /**
  * 修改策略
  */
-export async function strategyUpdate(id: string, options?: { [key: string]: any }) {
-  return request(`/api/strategy/${id}`, {
-    method: 'POST',
+export async function strategyUpdate(options?: { [key: string]: any }) {
+  return request('/api/rule-service/updateStrategy', {
+    method: 'PUT',
     data: {
       ...(options || {}),
     },
@@ -242,8 +251,11 @@ export async function strategyUpdate(id: string, options?: { [key: string]: any 
 }
 
 export async function strategyDetail(id: string) {
-  return request<API.StrategyItem>(`/api/strategy/${id}`, {
+  return request<{ data: API.StrategyItem }>('/api/rule-service/getStrategyDetail', {
     method: 'GET',
+    params: {
+      id,
+    },
   });
 }
 

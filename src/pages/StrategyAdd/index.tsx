@@ -5,7 +5,7 @@ import { useNavigate, useRequest } from '@umijs/max';
 import { Form, Typography, message } from 'antd';
 import React, { useRef } from 'react';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const TableList: React.FC = () => {
   const formRef = useRef();
@@ -26,7 +26,7 @@ const TableList: React.FC = () => {
   function submit(values) {
     return run({
       ...values,
-      rule_list: values.rule_list.map((item) => item.id),
+      smallRuleIds: values.rule_list.map((item) => item.id),
     });
   }
 
@@ -55,8 +55,8 @@ const TableList: React.FC = () => {
             },
           }}
         >
-          <ProFormText name="strategy_name" label="审核策略名称" />
-          <ProFormTextArea colProps={{ span: 24 }} name="strategy_desc" label="审核策略描述" />
+          <ProFormText name="name" label="审核策略名称" />
+          <ProFormTextArea colProps={{ span: 24 }} name="description" label="审核策略描述" />
 
           <Form.Item name="rule_list" label="审查规则">
             <RuleFormItem />

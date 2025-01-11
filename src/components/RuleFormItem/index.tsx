@@ -21,31 +21,42 @@ export function RuleDrawer(props) {
   const ruleColumns = [
     {
       title: '规则名称',
-      dataIndex: 'rule_name',
+      dataIndex: 'name',
     },
     {
       title: '规则描述',
-      dataIndex: 'rule_desc',
+      dataIndex: 'description',
     },
     {
       title: '规则来源',
-      dataIndex: 'created_by',
+      dataIndex: 'createdSource',
+      width: 100,
+      render(value) {
+        if (value === 0) {
+          return <span>系统创建</span>;
+        }
+        if (value === 1) {
+          return <span>用户自定义</span>;
+        }
+      },
     },
     {
       title: '风险等级',
-      dataIndex: 'risk_level',
-      render: (value) => {
-        let color = 'green';
-        if (value === 'MEDIUM') {
-          color = 'volcano';
+      dataIndex: 'riskLevel',
+      render(value) {
+        if (value === 0) {
+          return <Tag color="green">低风险</Tag>;
         }
-        return <Tag color={color}>{value}</Tag>;
+        if (value === 1) {
+          return <Tag color="orange">中风险</Tag>;
+        }
+        return <Tag color="red">高风险</Tag>;
       },
     },
   ];
 
   const filteredRuleList = useMemo(() => {
-    return rules?.filter((item) => item.rule_name?.includes(keywords));
+    return rules?.rulesDetailRecords.filter((item) => item.name?.includes(keywords));
   }, [keywords, rules]);
   function handleSelect(item: MenuInfo) {
     setSelected(item.key);
@@ -87,7 +98,7 @@ export function RuleDrawer(props) {
           <div className="flex flex-col h-full overflow-auto">
             {list && (
               <Menu
-                items={list.map((item) => ({ key: item.id, label: item.scenario_name }))}
+                items={list.records.map((item) => ({ key: item.id, label: item.name }))}
                 selectedKeys={[selected]}
                 onClick={handleSelect}
               />
@@ -129,21 +140,32 @@ export function RuleFormItem(props) {
     },
     {
       title: '规则名称',
-      dataIndex: 'rule_name',
+      dataIndex: 'name',
     },
     {
       title: '规则来源',
-      dataIndex: 'created_by',
+      dataIndex: 'createdSource',
+      width: 100,
+      render(value) {
+        if (value === 0) {
+          return <span>系统创建</span>;
+        }
+        if (value === 1) {
+          return <span>用户自定义</span>;
+        }
+      },
     },
     {
       title: '风险等级',
-      dataIndex: 'risk_level',
-      render: (value) => {
-        let color = 'green';
-        if (value === 'MEDIUM') {
-          color = 'volcano';
+      dataIndex: 'riskLevel',
+      render(value) {
+        if (value === 0) {
+          return <Tag color="green">低风险</Tag>;
         }
-        return <Tag color={color}>{value}</Tag>;
+        if (value === 1) {
+          return <Tag color="orange">中风险</Tag>;
+        }
+        return <Tag color="red">高风险</Tag>;
       },
     },
     {

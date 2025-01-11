@@ -1,4 +1,9 @@
-import { scenarioAdd, scenarioList, strategyList } from '@/services/ant-design-pro/api';
+import {
+  removeStrategy,
+  scenarioAdd,
+  scenarioList,
+  strategyList,
+} from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Link, useRequest } from '@umijs/max';
@@ -33,11 +38,26 @@ const handleAdd = async (fields: FormValueType) => {
   }
 };
 
+const handleRemoveStrategy = async (row: API.StrategyItem) => {
+  const hide = message.loading('正在删除');
+  if (!row) return true;
+  try {
+    await removeStrategy(row.id);
+    hide();
+    message.success('删除成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('删除失败，请重试');
+    return false;
+  }
+};
+
 const TableList: React.FC = () => {
   const [tab, setTab] = useState(0);
   const [ruleKey, setRuleKey] = useState('');
   const [strategyKey, setStrategyKey] = useState('');
-  const { data } = useRequest(strategyList);
+  const { data, refresh: refreshStrategy } = useRequest(strategyList);
   const { data: rules, refresh } = useRequest(scenarioList);
 
   const [scenarioModalOpen, setScenarioModalOpen] = useState(false);
@@ -65,6 +85,13 @@ const TableList: React.FC = () => {
     return data?.records.filter((item) => item.name.includes(strategyKey)) ?? [];
   }, [data, strategyKey]);
 
+  async function handleDelStrategy(row: API.StrategyItem) {
+    const success = await handleRemoveStrategy(row);
+    if (success) {
+      refreshStrategy();
+    }
+  }
+
   return (
     <PageContainer>
       <Text type="secondary">合同配置可以配置专属的自定义审核规则</Text>
@@ -90,11 +117,15 @@ const TableList: React.FC = () => {
               dataSource={filterStrategies}
               renderItem={(item) => (
                 <List.Item>
-                  <Card title={item.strategy_name}>
-                    <div className="text-sm">{item.strategy_desc}</div>
-                    <div className="mt-2 flex justify-end">
+                  <Card title={item.name}>
+                    <div className="text-sm">{item.description}</div>
+                    <div className="mt-2 flex justify-end gap-2">
+                      <Button danger onClick={() => handleDelStrategy(item)}>
+                        删除策略
+                      </Button>
+
                       <Button>
-                        <Link to="/clm/config/strategy-edit/222">配置策略</Link>
+                        <Link to={`/clm/config/strategy-edit/${item.id}`}>配置策略</Link>
                       </Button>
                     </div>
                   </Card>
