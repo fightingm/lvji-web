@@ -1,10 +1,4 @@
-import {
-  ModalForm,
-  ProFormRadio,
-  ProFormSelect,
-  ProFormText,
-  ProFormTextArea,
-} from '@ant-design/pro-components';
+import { ModalForm, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import React from 'react';
 
 export type FormValueType = {
@@ -26,15 +20,15 @@ export type AddFormProps = {
 const riskList = [
   {
     label: '高风险',
-    value: '1',
+    value: 2,
   },
   {
     label: '中风险',
-    value: '2',
+    value: 1,
   },
   {
     label: '低风险',
-    value: '3',
+    value: 0,
   },
 ];
 
@@ -45,10 +39,10 @@ const AddForm: React.FC<AddFormProps> = (props) => {
       ...fields,
     });
   }
-  const typesValue = props.types.map((item) => ({ lael: item.rule_type, value: item.id }));
+  //   const typesValue = props.types.map((item) => ({ lael: item.rule_type, value: item.id }));
   return (
     <ModalForm
-      title="修改审查规则"
+      title="新增审查规则"
       open={props.visible}
       autoFocusFirstInput
       modalProps={{
@@ -58,10 +52,10 @@ const AddForm: React.FC<AddFormProps> = (props) => {
       initialValues={props.values}
       onFinish={handleSubmit}
     >
-      <ProFormRadio.Group name="risk_level" label="风险等级" options={riskList} />
-      <ProFormText name="rule_name" label="规则名称" />
-      <ProFormTextArea name="rule_desc" label="规则内容" />
-      <ProFormSelect name="rule_type" label="规则类型" options={typesValue} />
+      <ProFormRadio.Group name="riskLevel" label="风险等级" options={riskList} />
+      <ProFormText name="name" label="规则名称" />
+      <ProFormTextArea name="description" label="规则内容" />
+      {/* <ProFormSelect name="rule_type" label="规则类型" options={typesValue} /> */}
     </ModalForm>
   );
 };

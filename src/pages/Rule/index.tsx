@@ -1,10 +1,4 @@
-import {
-  addRule,
-  removeRule,
-  ruleList,
-  ruleTypeList,
-  updateRule,
-} from '@/services/ant-design-pro/api';
+import { addRule, removeRule, ruleList, updateRule } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useParams, useRequest } from '@umijs/max';
@@ -13,46 +7,7 @@ import React, { useMemo, useState } from 'react';
 import AddForm from './components/AddFrom';
 import UpdateForm from './components/UpdateForm';
 
-const { Title, Text } = Typography;
-
-const list = [
-  {
-    id: '3d22c772-30e4-45b8-bc1c-88122ed952c8',
-    scenario_id: '05a0752e-a8e6-4c51-b1b8-4d4e489525a1',
-    rule_name: '隐瞒财产',
-    rule_type_id: 2,
-    rule_desc: '审查是否存在一方隐瞒财产的情况，是否有相应的惩罚措施。',
-    risk_level: 'MEDIUM',
-    is_deleted: false,
-    created_by: 'system',
-    created_at: '2024-08-27 23:43:50',
-    rule_type: '审查该合同类型特有的风险 ',
-  },
-  {
-    id: '15ce6e2f-5592-4c70-9090-2ee72ec7de33',
-    scenario_id: '05a0752e-a8e6-4c51-b1b8-4d4e489525a1',
-    rule_name: '违约责任',
-    rule_type_id: 2,
-    rule_desc: '审查违约责任条款是否明确，是否合理，是否有利于保障双方的合法权益。',
-    risk_level: 'HIGH',
-    is_deleted: false,
-    created_by: 'system',
-    created_at: '2024-08-27 23:43:50',
-    rule_type: '审查该合同类型特有的风险 ',
-  },
-  {
-    id: '0c5a924a-5d1e-4e27-b680-a2c75a86c5c5',
-    scenario_id: '05a0752e-a8e6-4c51-b1b8-4d4e489525a1',
-    rule_name: '协议履行保障',
-    rule_type_id: 2,
-    rule_desc: '审查是否有保障协议履行的措施，如财产担保等。',
-    risk_level: 'MEDIUM',
-    is_deleted: false,
-    created_by: 'system',
-    created_at: '2024-08-27 23:43:50',
-    rule_type: '审查该合同类型特有的风险 ',
-  },
-];
+const { Text } = Typography;
 
 const handleRemove = async (row: API.RuleTypeItem) => {
   const hide = message.loading('正在删除');
@@ -71,9 +26,8 @@ const handleRemove = async (row: API.RuleTypeItem) => {
 
 const handleUpdate = async (fields: Record<string, any>) => {
   const hide = message.loading('更新中');
-  const { id, ...rest } = fields;
   try {
-    await updateRule(id!, rest);
+    await updateRule(fields);
     hide();
     message.success('修改成功');
     return true;
@@ -104,43 +58,60 @@ const TableList: React.FC = () => {
     defaultParams: [params.id!],
   });
 
-  const { data: ruleTypes = [] } = useRequest(ruleTypeList);
-
   const [updateModalOpen, handleUpdateModalOpen] = useState(false);
   const [addModalOpen, handleAddModalOpen] = useState(false);
   const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
   const [keywords, setKeywords] = useState('');
 
   const filteredRuleList = useMemo(() => {
-    return rules?.filter((item) => item.rule_name?.includes(keywords));
+    return rules?.rulesDetailRecords.filter((item) => item.name?.includes(keywords));
   }, [keywords, rules]);
+
+  async function handleDel(row: API.RuleListItem) {
+    const success = await handleRemove(row);
+    if (success) {
+      refresh();
+    }
+  }
+
+  function showUpdate(row: API.RuleListItem) {
+    handleUpdateModalOpen(true);
+    setCurrentRow(row);
+  }
 
   const columns = [
     {
       title: '名称',
-      dataIndex: 'rule_name',
+      dataIndex: 'name',
     },
     {
       title: '描述',
-      dataIndex: 'rule_desc',
-    },
-    {
-      title: '规则类别',
-      dataIndex: 'rule_type',
+      dataIndex: 'description',
     },
     {
       title: '创建来源',
-      dataIndex: 'created_by',
+      dataIndex: 'createdSource',
+      width: 100,
+      render(value) {
+        if (value === 0) {
+          return <span>系统创建</span>;
+        }
+        if (value === 1) {
+          return <span>用户自定义</span>;
+        }
+      },
     },
     {
       title: '风险等级',
-      dataIndex: 'risk_level',
-      render: (value) => {
-        let color = 'green';
-        if (value === 'MEDIUM') {
-          color = 'volcano';
+      dataIndex: 'riskLevel',
+      render(value) {
+        if (value === 0) {
+          return <Tag color="green">低风险</Tag>;
         }
-        return <Tag color={color}>{value}</Tag>;
+        if (value === 1) {
+          return <Tag color="orange">中风险</Tag>;
+        }
+        return <Tag color="red">高风险</Tag>;
       },
     },
     {
@@ -169,18 +140,6 @@ const TableList: React.FC = () => {
     },
   ];
 
-  async function handleDel(row: API.RuleListItem) {
-    const success = await handleRemove(row);
-    if (success) {
-      refresh();
-    }
-  }
-
-  function showUpdate(row: API.RuleListItem) {
-    handleUpdateModalOpen(true);
-    setCurrentRow(row);
-  }
-
   function updateCancel() {
     handleUpdateModalOpen(false);
     setCurrentRow(undefined);
@@ -188,12 +147,11 @@ const TableList: React.FC = () => {
 
   async function updateConfirm(value: API.RuleListItem) {
     const success = await handleUpdate({
-      id: value.id,
-      scenario_id: params.id,
-      rule_name: value.rule_name,
-      rule_desc: value.rule_desc,
-      risk_level: value.risk_level,
-      rule_type_id: value.rule_type,
+      ruleDetailId: value.id,
+      ruleTableId: params.id,
+      name: value.name,
+      description: value.description,
+      riskLevel: value.riskLevel,
     });
     if (success) {
       handleUpdateModalOpen(false);
@@ -212,11 +170,11 @@ const TableList: React.FC = () => {
 
   async function addConfirm(value: API.RuleListItem) {
     const success = await handleAdd({
-      scenario_id: params.id,
-      rule_name: value.rule_name,
-      rule_desc: value.rule_desc,
-      risk_level: value.risk_level,
-      rule_type_id: value.rule_type,
+      ruleTableId: params.id,
+      name: value.name,
+      description: value.description,
+      riskLevel: value.riskLevel,
+      createdSource: 1,
     });
     if (success) {
       handleAddModalOpen(false);
@@ -245,16 +203,9 @@ const TableList: React.FC = () => {
         onSubmit={updateConfirm}
         onCancel={updateCancel}
         visible={updateModalOpen}
-        types={ruleTypes}
         values={currentRow || {}}
       />
-      <AddForm
-        onSubmit={addConfirm}
-        onCancel={addCancel}
-        visible={addModalOpen}
-        types={ruleTypes}
-        values={{}}
-      />
+      <AddForm onSubmit={addConfirm} onCancel={addCancel} visible={addModalOpen} values={{}} />
     </PageContainer>
   );
 };

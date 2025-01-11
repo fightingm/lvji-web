@@ -36,15 +36,16 @@ declare namespace API {
 
   type RuleListItem = {
     id: string;
-    rule_name?: string;
-    rule_desc?: string;
+    name?: string;
+    description?: string;
     created_by?: string;
-    risk_level?: string;
-    rule_type?: string;
+    riskLevel?: string;
   };
 
   type RuleList = {
-    data?: RuleListItem[];
+    data?: {
+      rulesDetailRecords: RuleListItem[];
+    };
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
@@ -161,20 +162,29 @@ declare namespace API {
 
   type StrategyItem = {
     id: string;
-    strategy_name: string;
+    name: string;
     strategy_desc: string;
   };
 
   type StrategyList = {
-    data?: StrategyItem[];
+    data?: {
+      records: StrategyItem[];
+      size: number;
+      total: number;
+    };
   };
 
   type ScenarioItem = {
     id: string;
-    scenario_name: string;
+    name: string;
+    createdSource: 0 | 1;
   };
 
   type ScenarioList = {
-    data?: ScenarioItem[];
+    data?: {
+      records: ScenarioItem[];
+      size: number;
+      total: number;
+    };
   };
 }

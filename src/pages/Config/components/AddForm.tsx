@@ -27,7 +27,7 @@ const AddForm: React.FC<AddFormProps> = (props) => {
       }}
       onFinish={props.onSubmit}
     >
-      <ProFormText name="scenario_name" label="规则集名称" />
+      <ProFormText name="name" label="规则集名称" />
     </ModalForm>
   );
 };

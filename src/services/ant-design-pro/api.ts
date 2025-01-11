@@ -70,9 +70,9 @@ export async function rule(
 }
 
 /** 更新规则 /api/rule */
-export async function updateRule(id: string, options?: { [key: string]: any }) {
-  return request(`/api/rule/${id}`, {
-    method: 'POST',
+export async function updateRule(options?: { [key: string]: any }) {
+  return request('/api/rule-service/update-small-rule', {
+    method: 'PUT',
     data: {
       ...(options || {}),
     },
@@ -81,7 +81,7 @@ export async function updateRule(id: string, options?: { [key: string]: any }) {
 
 /** 新建规则 POST /api/rule */
 export async function addRule(options?: { [key: string]: any }) {
-  return request('/api/rule_add', {
+  return request('/api/rule-service/add-small-rule', {
     method: 'POST',
     data: {
       ...(options || {}),
@@ -162,18 +162,28 @@ export async function contractTypeList() {
 /**
  * 获取策略列表
  */
-export async function strategyList() {
-  return request<API.StrategyList>('/api/strategy/list', {
+export async function strategyList(words?: string) {
+  return request<API.StrategyList>('/api/rule-service/getStrategiesByPage', {
     method: 'GET',
+    params: {
+      current: 1,
+      size: 999,
+      words,
+    },
   });
 }
 
 /**
  * 获取规则列表
  */
-export async function scenarioList() {
-  return request<API.ScenarioList>('/api/scenario/list', {
+export async function scenarioList(words?: string) {
+  return request<API.ScenarioList>('/api/rule-service/table/gets', {
     method: 'GET',
+    params: {
+      current: 1,
+      size: 999,
+      words,
+    },
   });
 }
 
@@ -181,11 +191,8 @@ export async function scenarioList() {
  * 某个规则集的全部规则
  */
 export async function ruleList(id: string) {
-  return request<API.RuleList>('/api/rule/list', {
+  return request<API.RuleList>(`/api/rule-service/table/get/${id}`, {
     method: 'GET',
-    params: {
-      id,
-    },
   });
 }
 
@@ -193,8 +200,11 @@ export async function ruleList(id: string) {
  * 删除规则
  */
 export async function removeRule(id: string) {
-  return request<Record<string, any>>(`/api/rule/${id}`, {
+  return request<Record<string, any>>('/api/rule-service/delete-small-rule', {
     method: 'DELETE',
+    params: {
+      smallRuleId: id,
+    },
   });
 }
 
@@ -241,7 +251,7 @@ export async function strategyDetail(id: string) {
  * 新增规则
  */
 export async function scenarioAdd(options?: { [key: string]: any }) {
-  return request('/api/scenario/add', {
+  return request('/api/rule-service/table/add', {
     method: 'POST',
     data: {
       ...(options || {}),

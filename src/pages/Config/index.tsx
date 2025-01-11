@@ -3,10 +3,10 @@ import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Link, useRequest } from '@umijs/max';
 import { Button, Card, Input, List, Segmented, Typography, message } from 'antd';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import AddForm, { FormValueType } from './components/AddForm';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const tabs = [
   {
@@ -35,6 +35,8 @@ const handleAdd = async (fields: FormValueType) => {
 
 const TableList: React.FC = () => {
   const [tab, setTab] = useState(0);
+  const [ruleKey, setRuleKey] = useState('');
+  const [strategyKey, setStrategyKey] = useState('');
   const { data } = useRequest(strategyList);
   const { data: rules, refresh } = useRequest(scenarioList);
 
@@ -55,6 +57,14 @@ const TableList: React.FC = () => {
     }
   }
 
+  const filterRules = useMemo(() => {
+    return rules?.records.filter((item) => item.name.includes(ruleKey)) ?? [];
+  }, [rules, ruleKey]);
+
+  const filterStrategies = useMemo(() => {
+    return data?.records.filter((item) => item.name.includes(strategyKey)) ?? [];
+  }, [data, strategyKey]);
+
   return (
     <PageContainer>
       <Text type="secondary">合同配置可以配置专属的自定义审核规则</Text>
@@ -64,7 +74,12 @@ const TableList: React.FC = () => {
       {tab === 0 && (
         <>
           <div className="mt-4 flex items-center justify-between">
-            <Input className="w-[300px]" placeholder="输入配置名称搜索..." />
+            <Input
+              value={ruleKey}
+              onChange={(e) => setStrategyKey(e.target.value)}
+              className="w-[300px]"
+              placeholder="输入策略名称搜索..."
+            />
             <Button icon={<PlusOutlined />} iconPosition="start">
               <Link to="/clm/config/strategy-add">新增策略</Link>
             </Button>
@@ -72,7 +87,7 @@ const TableList: React.FC = () => {
           <div className="mt-4">
             <List
               grid={{ gutter: 16, column: 3 }}
-              dataSource={data}
+              dataSource={filterStrategies}
               renderItem={(item) => (
                 <List.Item>
                   <Card title={item.strategy_name}>
@@ -92,7 +107,12 @@ const TableList: React.FC = () => {
       {tab === 1 && (
         <>
           <div className="mt-4 flex items-center justify-between">
-            <Input className="w-[300px]" placeholder="输入配置名称搜索..." />
+            <Input
+              value={ruleKey}
+              onChange={(e) => setRuleKey(e.target.value)}
+              className="w-[300px]"
+              placeholder="输入规则集名称搜索..."
+            />
             <Button icon={<PlusOutlined />} iconPosition="start" onClick={addScenarioOpen}>
               新增规则集
             </Button>
@@ -100,13 +120,13 @@ const TableList: React.FC = () => {
           <div className="mt-4">
             <List
               grid={{ gutter: 16, column: 3 }}
-              dataSource={rules}
+              dataSource={filterRules}
               renderItem={(item) => (
                 <List.Item>
-                  <Card title={item.scenario_name}>
+                  <Card title={item.name}>
                     <div className="flex justify-end">
-                      <Button>
-                        <Link to="/clm/config/rule-edit/222">配置规则</Link>
+                      <Button disabled={item.createdSource === 0}>
+                        <Link to={`/clm/config/rule-edit/${item.id}`}>配置规则</Link>
                       </Button>
                     </div>
                   </Card>
