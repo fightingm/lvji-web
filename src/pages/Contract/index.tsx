@@ -1,5 +1,4 @@
 import {
-  addRule,
   contract,
   contractDetail,
   removeContract,
@@ -10,35 +9,14 @@ import { Radar } from '@ant-design/charts';
 import { InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { useIntl } from '@umijs/max';
-import { Button, Drawer, GetProp, Modal, Upload, UploadFile, UploadProps, message } from 'antd';
+import { Link } from '@umijs/max';
+import { Button, Drawer, Modal, Upload, UploadFile, UploadProps, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import Detail from './components/Detail';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 
 const { Dragger } = Upload;
-
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
 
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('更新中');
@@ -79,13 +57,7 @@ const TableList: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.ContractListItem>();
-  const [detail, setDetail] = useState<API.ContractListItem>();
-
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
+  const [detail, setDetail] = useState<{ data: API.ContractListItem }>();
 
   function handleDel(row: API.ContractListItem) {
     Modal.confirm({
@@ -137,26 +109,26 @@ const TableList: React.FC = () => {
   const columns: ProColumns<API.ContractListItem>[] = [
     {
       title: '合同标题',
-      dataIndex: 'contract_name',
+      dataIndex: 'name',
       render: (dom) => {
         return <span className="font-medium">{dom}</span>;
       },
     },
-    {
-      title: '合同阶段',
-      dataIndex: 'stage_code',
-      search: false,
-      valueEnum: {
-        1: '起草',
-        2: '审核',
-        3: '签订',
-        4: '履约中',
-        5: '已完成',
-      },
-    },
+    // {
+    //   title: '合同阶段',
+    //   dataIndex: 'stage_code',
+    //   search: false,
+    //   valueEnum: {
+    //     1: '起草',
+    //     2: '审核',
+    //     3: '签订',
+    //     4: '履约中',
+    //     5: '已完成',
+    //   },
+    // },
     {
       title: '解析状态',
-      dataIndex: 'parse_status',
+      dataIndex: 'status',
       hideInForm: true,
       search: false,
       valueEnum: {
@@ -176,7 +148,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '创建时间',
-      dataIndex: 'created_at',
+      dataIndex: 'createTime',
       valueType: 'dateTime',
       search: false,
     },
@@ -212,21 +184,15 @@ const TableList: React.FC = () => {
         >
           修改
         </Button>,
-        <Button
-          key="check"
-          size="small"
-          color="primary"
-          variant="link"
-          onClick={() => showUpdate(record)}
-        >
-          智能审查
+        <Button key="check" size="small" color="primary" variant="link">
+          <Link to={`/clm/contract/step/${record.id}`}>智能审查</Link>
         </Button>,
       ],
     },
   ];
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [uploading, setUploading] = useState(false);
+  //   const [uploading, setUploading] = useState(false);
 
   const uploadProps: UploadProps = {
     onRemove: (file) => {
@@ -247,7 +213,7 @@ const TableList: React.FC = () => {
   };
 
   const handleUpload = () => {
-    setUploading(true);
+    // setUploading(true);
     const fileRequest = fileList.map((item) => uploadContract(item as unknown as File));
     Promise.all(fileRequest)
       .then(() => {
@@ -259,7 +225,8 @@ const TableList: React.FC = () => {
         message.error('上传失败，请重试');
       })
       .finally(() => {
-        setUploading(false);
+        actionRef.current?.reload();
+        // setUploading(false);
       });
   };
 
@@ -312,7 +279,13 @@ const TableList: React.FC = () => {
             labelWidth: 120,
           }}
           toolbar={{ settings: undefined }}
-          request={contract}
+          request={async (...args) => {
+            const res = await contract(...args);
+            return {
+              data: res.data?.records ?? [],
+              total: res.data?.total ?? 0,
+            };
+          }}
           columns={columns}
         />
       </div>
@@ -357,7 +330,7 @@ const TableList: React.FC = () => {
         }}
         closable={false}
       >
-        {detail && <Detail data={detail} />}
+        {detail && <Detail data={detail.data} />}
       </Drawer>
       <Radar />
     </PageContainer>

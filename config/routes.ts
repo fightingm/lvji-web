@@ -45,11 +45,11 @@ export default [
         component: './Contract',
       },
       {
-        path: '/clm/contract/step',
+        path: '/clm/contract/step/:id',
         component: './ContractStep',
       },
       {
-        path: '/clm/contract/detail',
+        path: '/clm/contract/detail/:id',
         component: './ContractDetail',
       },
     ],

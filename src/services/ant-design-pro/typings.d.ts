@@ -109,24 +109,25 @@ declare namespace API {
 
   type ContractListItem = {
     id: string;
-    amount: string;
-    contract_name: string;
+    price: string;
+    name: string;
+    title: string;
     stage_code: string;
     parse_status: string;
-    created_at: string;
-    contract_type: string;
-    start_date: string;
-    end_date: string;
+    createTime: string;
+    type: string;
+    startTime: string;
+    endTime: string;
     file_list: File[];
-    parties: {
-      party_a: string;
-      party_b: string;
-      party_c: string;
-    };
+    parta: string;
+    partb: string;
+    reviewer: string;
   };
   type ContractList = {
-    data?: ContractListItem[];
-    total?: number;
+    data?: {
+      records: ContractListItem[];
+      total?: number;
+    };
     success?: boolean;
   };
 

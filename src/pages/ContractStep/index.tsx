@@ -11,9 +11,12 @@ function Step1(props) {
   const [strategy, setStragety] = useState();
   const [annotations, setAnnotations] = useState('');
 
-  const { data: strategyArr = [] } = useRequest(strategyList);
+  const { data: strategyArr } = useRequest(strategyList);
 
-  const selectOptions = strategyArr?.map((item) => ({ label: item.strategy_name, value: item.id }));
+  const selectOptions = strategyArr?.records?.map((item) => ({
+    label: item.name,
+    value: item.id,
+  }));
 
   function confirm() {
     props.onOk({
@@ -223,6 +226,7 @@ function Step2(props) {
         <div className="flex flex-wrap mt-5">
           {items.map((item) => (
             <div
+              key={item.value}
               className="flex-shrink-0 flex-grow-0 basis-1/2 p-3"
               onClick={() => check(item.value)}
             >
@@ -268,7 +272,7 @@ const TableList: React.FC = () => {
     console.log('xxx', value);
     setStep(1);
   }
-  function back(value) {
+  function back() {
     setStep(0);
   }
   function finish(value) {

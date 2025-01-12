@@ -97,17 +97,18 @@ export async function contract(
   },
   options?: { [key: string]: any },
 ) {
-  return request<API.ContractList>('/api/contract', {
+  return request<API.ContractList>('/api/llm-service/retrieval', {
     method: 'GET',
     params: {
-      ...params,
+      current: params.current,
+      size: params.pageSize,
     },
     ...(options || {}),
   });
 }
 
 export async function contractDetail(id: string) {
-  return request<API.ContractListItem>(`/api/contract/${id}`, {
+  return request<API.ContractListItem>(`/api/llm-service/retrieval/${id}`, {
     method: 'GET',
   });
 }
@@ -122,7 +123,7 @@ export async function updateContract(id: string, options?: { [key: string]: any 
 }
 
 export async function removeContract(id: string) {
-  return request<Record<string, any>>(`/api/contract/${id}`, {
+  return request<Record<string, any>>(`/api/llm-service/delete/${id}`, {
     method: 'DELETE',
   });
 }
@@ -277,9 +278,10 @@ export async function scenarioAdd(options?: { [key: string]: any }) {
 export async function uploadContract(file: File) {
   const formData = new FormData();
   if (file) {
-    formData.append('file', file);
+    // console.log('xxxx', file);
+    formData.append('docxFile', file.originFileObj);
   }
-  return request('/api/contract/upload', {
+  return request('/api/llm-service/upload', {
     method: 'POST',
     data: formData,
     requestType: 'form',
