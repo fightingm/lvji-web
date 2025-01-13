@@ -90,32 +90,28 @@ export async function addRule(options?: { [key: string]: any }) {
 }
 
 /** 获取合同列表 GET /api/contract */
-export async function contract(
-  params: {
-    current?: number;
-    pageSize?: number;
-  },
-  options?: { [key: string]: any },
-) {
+export async function contract(params: any, options?: { [key: string]: any }) {
+  const { pageSize, title: query, ...rest } = params;
   return request<API.ContractList>('/api/llm-service/retrieval', {
     method: 'GET',
     params: {
-      current: params.current,
       size: params.pageSize,
+      query,
+      ...rest,
     },
     ...(options || {}),
   });
 }
 
 export async function contractDetail(id: string) {
-  return request<API.ContractListItem>(`/api/llm-service/retrieval/${id}`, {
+  return request<{ data: API.ContractListItem }>(`/api/llm-service/retrieval/${id}`, {
     method: 'GET',
   });
 }
 
-export async function updateContract(id: string, options?: { [key: string]: any }) {
-  return request(`/api/contract/${id}`, {
-    method: 'POST',
+export async function updateContract(options?: { [key: string]: any }) {
+  return request('/api/llm-service/update', {
+    method: 'PUT',
     data: {
       ...(options || {}),
     },
@@ -155,7 +151,7 @@ export async function analysisDetail(id: string) {
  * 合同类型列表
  */
 export async function contractTypeList() {
-  return request<API.ContractTypeList>('/api/contract_type/list', {
+  return request<API.ContractTypeList>('/api/llm-service/get/types', {
     method: 'GET',
   });
 }

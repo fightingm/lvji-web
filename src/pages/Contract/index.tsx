@@ -20,9 +20,8 @@ const { Dragger } = Upload;
 
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('更新中');
-  const { id, ...rest } = fields;
   try {
-    await updateContract(id!, rest);
+    await updateContract(fields);
     hide();
     message.success('修改成功');
     return true;
@@ -56,7 +55,6 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.ContractListItem>();
   const [detail, setDetail] = useState<{ data: API.ContractListItem }>();
 
   function handleDel(row: API.ContractListItem) {
@@ -83,16 +81,15 @@ const TableList: React.FC = () => {
     }
   }
 
-  function showUpdate(row: API.ContractListItem) {
+  function showUpdate() {
     handleUpdateModalOpen(true);
-    setCurrentRow(row);
   }
 
   async function updateConfirm(value: API.ContractListItem) {
     const success = await handleUpdate(value);
     if (success) {
       handleUpdateModalOpen(false);
-      setCurrentRow(undefined);
+      setDetail(undefined);
       if (actionRef.current) {
         actionRef.current.reload();
       }
@@ -102,30 +99,23 @@ const TableList: React.FC = () => {
   function updateCancel() {
     handleUpdateModalOpen(false);
     if (!showDetail) {
-      setCurrentRow(undefined);
+      setDetail(undefined);
     }
   }
 
   const columns: ProColumns<API.ContractListItem>[] = [
     {
       title: '合同标题',
-      dataIndex: 'name',
+      dataIndex: 'title',
       render: (dom) => {
         return <span className="font-medium">{dom}</span>;
       },
     },
-    // {
-    //   title: '合同阶段',
-    //   dataIndex: 'stage_code',
-    //   search: false,
-    //   valueEnum: {
-    //     1: '起草',
-    //     2: '审核',
-    //     3: '签订',
-    //     4: '履约中',
-    //     5: '已完成',
-    //   },
-    // },
+    {
+      title: '合同阶段',
+      dataIndex: 'stage',
+      search: false,
+    },
     {
       title: '解析状态',
       dataIndex: 'status',
@@ -148,7 +138,7 @@ const TableList: React.FC = () => {
     },
     {
       title: '创建时间',
-      dataIndex: 'createTime',
+      dataIndex: 'createTimeStamp',
       valueType: 'dateTime',
       search: false,
     },
@@ -174,15 +164,6 @@ const TableList: React.FC = () => {
           onClick={() => handleDel(record)}
         >
           删除
-        </Button>,
-        <Button
-          key="view"
-          size="small"
-          color="primary"
-          variant="link"
-          onClick={() => showUpdate(record)}
-        >
-          修改
         </Button>,
         <Button key="check" size="small" color="primary" variant="link">
           <Link to={`/clm/contract/step/${record.id}`}>智能审查</Link>
@@ -313,7 +294,7 @@ const TableList: React.FC = () => {
         onSubmit={updateConfirm}
         onCancel={updateCancel}
         visible={updateModalOpen}
-        values={currentRow || {}}
+        values={detail?.data || {}}
       />
 
       <Drawer
@@ -330,7 +311,7 @@ const TableList: React.FC = () => {
         }}
         closable={false}
       >
-        {detail && <Detail data={detail.data} />}
+        {detail && <Detail data={detail.data} showUpdate={showUpdate} />}
       </Drawer>
       <Radar />
     </PageContainer>

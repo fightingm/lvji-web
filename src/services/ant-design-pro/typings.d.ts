@@ -112,12 +112,12 @@ declare namespace API {
     price: string;
     name: string;
     title: string;
-    stage_code: string;
+    stage: string;
     parse_status: string;
-    createTime: string;
+    createTimeStamp: number;
     type: string;
-    startTime: string;
-    endTime: string;
+    startTime: number;
+    endTime: number;
     file_list: File[];
     parta: string;
     partb: string;
@@ -137,7 +137,7 @@ declare namespace API {
   };
 
   type ContractTypeList = {
-    data?: ContractType[];
+    data?: string[];
   };
 
   type AnalysisListItem = {

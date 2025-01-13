@@ -2,9 +2,11 @@ import { contractTypeList } from '@/services/ant-design-pro/api';
 import {
   ModalForm,
   ProFormDatePicker,
+  ProFormDigit,
   ProFormSelect,
   ProFormText,
 } from '@ant-design/pro-components';
+import dayjs from 'dayjs';
 import React from 'react';
 
 export type FormValueType = {
@@ -23,14 +25,11 @@ export type UpdateFormProps = {
 };
 
 const stageMap = {
-  '1': '起草中',
-  '2': '审核中',
-  '3': '签订完成',
-  '4': '履约中',
-  '5': '纠纷处理中',
-  '6': '已终止',
-  '7': '已到期',
-  '8': '已完成',
+  起草中: '起草中',
+  审核中: '审核中',
+  签订中: '签订中',
+  履约中: '履约中',
+  已完成: '已完成',
 };
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
@@ -38,12 +37,14 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
     return props.onSubmit({
       ...props.values,
       ...fields,
+      startTime: dayjs(fields.startTime).valueOf(),
+      endTime: dayjs(fields.endTime).valueOf(),
     });
   }
   async function typeListReq() {
     try {
       const result = await contractTypeList();
-      return result.data?.map((item) => ({ label: item.contract_type, value: item.id })) ?? [];
+      return result.data?.map((item) => ({ label: item, value: item })) ?? [];
     } catch (error) {
       return [];
     }
@@ -60,12 +61,12 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       initialValues={props.values}
       onFinish={handleSubmit}
     >
-      <ProFormText name="contract_name" label="合同标题" />
-      <ProFormSelect name="contract_type" label="合同类型" request={typeListReq} />
-      <ProFormText name="amount" label="合同对价" />
-      <ProFormSelect name="stage_code" label="合同阶段" valueEnum={stageMap} />
-      <ProFormDatePicker name="start_date" label="生效日期" />
-      <ProFormDatePicker name="end_date" label="终止日期" />
+      <ProFormText name="title" label="合同标题" />
+      <ProFormSelect name="type" label="合同类型" request={typeListReq} />
+      <ProFormDigit name="price" label="合同对价" />
+      <ProFormSelect name="stage" label="合同阶段" valueEnum={stageMap} />
+      <ProFormDatePicker name="startTime" label="生效日期" />
+      <ProFormDatePicker name="endTime" label="终止日期" />
     </ModalForm>
   );
 };

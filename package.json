@@ -55,6 +55,7 @@
     "antd": "^5.13.2",
     "antd-style": "^3.6.1",
     "classnames": "^2.5.1",
+    "dayjs": "^1.11.13",
     "docx-preview": "^0.3.3",
     "file-loader": "^6.2.0",
     "lodash": "^4.17.21",
