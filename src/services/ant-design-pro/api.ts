@@ -91,12 +91,12 @@ export async function addRule(options?: { [key: string]: any }) {
 
 /** 获取合同列表 GET /api/contract */
 export async function contract(params: any, options?: { [key: string]: any }) {
-  const { pageSize, title: query, ...rest } = params;
+  const { pageSize, title: words, ...rest } = params;
   return request<API.ContractList>('/api/llm-service/retrieval', {
     method: 'GET',
     params: {
       size: params.pageSize,
-      query,
+      words,
       ...rest,
     },
     ...(options || {}),
@@ -152,6 +152,20 @@ export async function analysisDetail(id: string) {
  */
 export async function contractTypeList() {
   return request<API.ContractTypeList>('/api/llm-service/get/types', {
+    method: 'GET',
+  });
+}
+
+// 统计数据
+export async function retrievalCount() {
+  return request('/api/llm-service/retrieval/count', {
+    method: 'GET',
+  });
+}
+
+// 首页统计数据
+export async function retrievalAll() {
+  return request('/api/llm-service/retrieval/all', {
     method: 'GET',
   });
 }

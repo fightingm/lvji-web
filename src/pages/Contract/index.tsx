@@ -2,6 +2,7 @@ import {
   contract,
   contractDetail,
   removeContract,
+  retrievalCount,
   updateContract,
   uploadContract,
 } from '@/services/ant-design-pro/api';
@@ -9,7 +10,7 @@ import { Radar } from '@ant-design/charts';
 import { InboxOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Link } from '@umijs/max';
+import { Link, useRequest } from '@umijs/max';
 import { Button, Drawer, Modal, Upload, UploadFile, UploadProps, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import Detail from './components/Detail';
@@ -48,6 +49,7 @@ const handleRemove = async (row: API.ContractListItem) => {
 };
 
 const TableList: React.FC = () => {
+  const { data } = useRequest(retrievalCount);
   const [uploadModalVisible, setUploadModalVisible] = useState<boolean>(false);
 
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
@@ -235,7 +237,7 @@ const TableList: React.FC = () => {
         <div className="rounded-xl border bg-card text-card-foreground shadow">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
             <p className="text-sm text-muted-foreground">本周</p>
-            <h3 className="font-semibold tracking-tight text-4xl">0个</h3>
+            <h3 className="font-semibold tracking-tight text-4xl">{data?.weekExpireCount}个</h3>
           </div>
           <div className="p-6 pt-0">
             <div className="text-xs text-muted-foreground">合同即将到期</div>
@@ -244,7 +246,7 @@ const TableList: React.FC = () => {
         <div className="rounded-xl border bg-card text-card-foreground shadow">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
             <p className="text-sm text-muted-foreground">本月</p>
-            <h3 className="font-semibold tracking-tight text-4xl">0个</h3>
+            <h3 className="font-semibold tracking-tight text-4xl">{data?.monthExpireCount}个</h3>
           </div>
           <div className="p-6 pt-0">
             <div className="text-xs text-muted-foreground">合同即将到期</div>

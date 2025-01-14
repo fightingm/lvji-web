@@ -1,188 +1,92 @@
-import { Column, Line, Pie } from '@ant-design/charts';
+import { retrievalAll } from '@/services/ant-design-pro/api';
+import { Line, Pie } from '@ant-design/charts';
+import { Column } from '@ant-design/plots';
 import { PageContainer } from '@ant-design/pro-components';
-import { useModel } from '@umijs/max';
-import { theme } from 'antd';
-import React from 'react';
-
-/**
- * 每个单独的卡片，为了复用样式抽成了组件
- * @param param0
- * @returns
- */
-const InfoCard: React.FC<{
-  title: string;
-  index: number;
-  desc: string;
-  href: string;
-}> = ({ title, href, index, desc }) => {
-  const { useToken } = theme;
-
-  const { token } = useToken();
-
-  return (
-    <div
-      style={{
-        backgroundColor: token.colorBgContainer,
-        boxShadow: token.boxShadow,
-        borderRadius: '8px',
-        fontSize: '14px',
-        color: token.colorTextSecondary,
-        lineHeight: '22px',
-        padding: '16px 19px',
-        minWidth: '220px',
-        flex: 1,
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          gap: '4px',
-          alignItems: 'center',
-        }}
-      >
-        <div
-          style={{
-            width: 48,
-            height: 48,
-            lineHeight: '22px',
-            backgroundSize: '100%',
-            textAlign: 'center',
-            padding: '8px 16px 16px 12px',
-            color: '#FFF',
-            fontWeight: 'bold',
-            backgroundImage:
-              "url('https://gw.alipayobjects.com/zos/bmw-prod/daaf8d50-8e6d-4251-905d-676a24ddfa12.svg')",
-          }}
-        >
-          {index}
-        </div>
-        <div
-          style={{
-            fontSize: '16px',
-            color: token.colorText,
-            paddingBottom: 8,
-          }}
-        >
-          {title}
-        </div>
-      </div>
-      <div
-        style={{
-          fontSize: '14px',
-          color: token.colorTextSecondary,
-          textAlign: 'justify',
-          lineHeight: '22px',
-          marginBottom: 8,
-        }}
-      >
-        {desc}
-      </div>
-      <a href={href} target="_blank" rel="noreferrer">
-        了解更多 {'>'}
-      </a>
-    </div>
-  );
-};
-
-const list = [
-  {
-    name: '合同总数',
-    value: '1个',
-    desc: '合同总数量',
-  },
-  {
-    name: '未审查合同',
-    value: '1个',
-    desc: '还未进行审查的合同数量',
-  },
-  {
-    name: '到期合同',
-    value: '1个',
-    desc: '到期合同数量',
-  },
-  {
-    name: '合同总金额',
-    value: '¥1000',
-    desc: '合同对价总额',
-  },
-];
-
-const data = [
-  { year: '2024-01', value: 2 },
-  { year: '2024-02', value: 3 },
-  { year: '2024-03', value: 4 },
-  { year: '2024-04', value: 3.5 },
-  { year: '2024-05', value: 5 },
-  { year: '2024-06', value: 4.9 },
-  { year: '2024-07', value: 6 },
-  { year: '2024-08', value: 7 },
-  { year: '2024-09', value: 9 },
-  { year: '2024-10', value: 13 },
-];
-
-const config = {
-  data,
-  height: 400,
-  xField: 'year',
-  yField: 'value',
-  point: {
-    size: 5,
-    shape: 'diamond',
-  },
-};
-
-const pieConfig = {
-  data: [
-    { type: '分类一', value: 27 },
-    { type: '分类二', value: 25 },
-    { type: '分类三', value: 18 },
-    { type: '分类四', value: 15 },
-    { type: '分类五', value: 10 },
-    { type: '其他', value: 5 },
-  ],
-  angleField: 'value',
-  colorField: 'type',
-  label: {
-    text: 'value',
-    style: {
-      fontWeight: 'bold',
-    },
-  },
-  legend: {
-    color: {
-      title: false,
-      position: 'right',
-      rowPadding: 5,
-    },
-  },
-};
-
-const columnConfig = {
-  data: {
-    type: 'fetch',
-    value: 'https://render.alipay.com/p/yuyan/180020010001215413/antd-charts/column-column.json',
-  },
-  xField: 'letter',
-  yField: 'frequency',
-  label: {
-    text: (d) => `${(d.frequency * 100).toFixed(1)}%`,
-    textBaseline: 'bottom',
-  },
-  axis: {
-    y: {
-      labelFormatter: '.0%',
-    },
-  },
-  style: {
-    // 圆角样式
-    radiusTopLeft: 10,
-    radiusTopRight: 10,
-  },
-};
+import { useRequest } from '@umijs/max';
+import React, { useMemo } from 'react';
 
 const Welcome: React.FC = () => {
-  const { token } = theme.useToken();
-  const { initialState } = useModel('@@initialState');
+  const { data } = useRequest(retrievalAll);
+
+  const list = [
+    {
+      name: '合同总数',
+      value: `${data?.totalNumber ?? '--'}个`,
+      desc: '合同总数量',
+    },
+    {
+      name: '未审查合同',
+      value: `${data?.uncheckedNumber ?? '--'}个`,
+      desc: '还未进行审查的合同数量',
+    },
+    {
+      name: '到期合同',
+      value: `${data?.expireNumber ?? '--'}个`,
+      desc: '到期合同数量',
+    },
+    {
+      name: '合同总金额',
+      value: `¥${data?.totalAmount ?? '--'}`,
+      desc: '合同对价总额',
+    },
+  ];
+
+  const lineConfig = useMemo(() => {
+    const arr = data?.timeGroupByList.reverse().map((item) => ({
+      日期: item.date,
+      数量: item.count,
+    }));
+    return {
+      data: arr,
+      height: 400,
+      xField: '日期',
+      yField: '数量',
+      point: {
+        size: 5,
+        shape: 'diamond',
+      },
+    };
+  }, [data]);
+
+  const colConfig = useMemo(() => {
+    const arr = data?.timeGroupByList.reverse().map((item) => ({
+      日期: item.date,
+      数量: item.count,
+    }));
+    return {
+      data: arr,
+      height: 400,
+      xField: '日期',
+      yField: '数量',
+      label: {
+        text: () => {
+          return '';
+        },
+        offset: 10,
+      },
+      legend: false,
+    };
+  }, [data]);
+
+  const pieConfig = useMemo(() => {
+    const arr = data?.typeGroupByList.map((item) => ({
+      类型: item.type,
+      数量: item.count,
+    }));
+    return {
+      data: arr,
+      angleField: '数量',
+      colorField: '类型',
+      label: {
+        text: '类型',
+        style: {
+          fontWeight: 'bold',
+        },
+      },
+      legend: false,
+    };
+  }, [data]);
+
   return (
     <PageContainer>
       <div className="grid gap-4 p-4 sm:px-6 sm:py-0">
@@ -202,18 +106,18 @@ const Welcome: React.FC = () => {
         <div className="rounded-xl border shadow">
           <div className="flex flex-col space-y-1.5 p-6">
             <h3 className="font-semibold leading-none tracking-tight">合同审查统计</h3>
-            <p className="text-sm">12月</p>
+            {/* <p className="text-sm">12月</p> */}
           </div>
-          <Line {...config} />
+          <Line {...lineConfig} />
         </div>
         <div className="grid gap-4 md:grid-cols-2 md:gap-8">
           <div className="rounded-xl border bg-card text-card-foreground shadow">
             <div className="flex flex-col space-y-1.5 p-6">
               <h3 className="font-semibold leading-none tracking-tight">上传合同统计</h3>
-              <p className="text-sm text-muted-foreground">30天</p>
+              {/* <p className="text-sm text-muted-foreground">30天</p> */}
             </div>
             <div className="p-6 pt-0">
-              <Column {...columnConfig} />
+              <Column {...colConfig} />
             </div>
           </div>
           <div className="rounded-xl border bg-card text-card-foreground shadow">
