@@ -109,6 +109,12 @@ export async function contractDetail(id: string) {
   });
 }
 
+export async function contractPre(id: string) {
+  return request<{ data: API.ContractListItem }>(`/api/llm-service/pre/review/${id}`, {
+    method: 'GET',
+  });
+}
+
 export async function updateContract(options?: { [key: string]: any }) {
   return request('/api/llm-service/update', {
     method: 'PUT',

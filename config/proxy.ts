@@ -20,6 +20,10 @@ export default {
       // 依赖 origin 的功能可能需要这个，比如 cookie
       changeOrigin: true,
     },
+    '/test/': {
+      target: 'https://yema-1252530263.cos.ap-chengdu.myqcloud.com',
+      changeOrigin: true,
+    },
   },
 
   /**

@@ -1,7 +1,7 @@
-import { strategyList } from '@/services/ant-design-pro/api';
+import { contractPre, strategyList } from '@/services/ant-design-pro/api';
 import { BulbOutlined, CheckCircleFilled } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { useNavigate, useRequest } from '@umijs/max';
+import { useNavigate, useParams, useRequest } from '@umijs/max';
 import { Button, Input, Select } from 'antd';
 import React, { useState } from 'react';
 
@@ -10,6 +10,7 @@ function Step1(props) {
   const [checkScale, setCheckScale] = useState(0);
   const [strategy, setStragety] = useState();
   const [annotations, setAnnotations] = useState('');
+  const data = props.data;
 
   const { data: strategyArr } = useRequest(strategyList);
 
@@ -46,9 +47,7 @@ function Step1(props) {
             onClick={() => setPosition(0)}
           >
             <div className="text-[#86909c] text-base">甲方</div>
-            <div className="h-[96px] overflow-hidden text-2xl font-bold">
-              四川省鼎艺源贸易有限公司
-            </div>
+            <div className="h-[96px] overflow-hidden text-2xl font-bold">{data.partyA}</div>
           </div>
           <div
             className={`flex-1 px-4 py-5 border border-[#e5e6eb] rounded-md cursor-pointer hover:border-[#009e59] ${
@@ -57,9 +56,7 @@ function Step1(props) {
             onClick={() => setPosition(1)}
           >
             <div className="text-[#86909c] text-base">乙方</div>
-            <div className="h-[96px] overflow-hidden text-2xl font-bold">
-              四川省鼎艺源贸易有限公司
-            </div>
+            <div className="h-[96px] overflow-hidden text-2xl font-bold">{data.partyB}</div>
           </div>
         </div>
       </div>
@@ -267,6 +264,12 @@ function Step2(props) {
 const TableList: React.FC = () => {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
+  const params = useParams();
+  const { data } = useRequest(contractPre, {
+    defaultParams: [params.id!],
+  });
+
+  console.log('xxx', data);
 
   function next(value) {
     console.log('xxx', value);
@@ -281,10 +284,14 @@ const TableList: React.FC = () => {
     navigate('/clm/contract/detail');
   }
 
+  if (!data) {
+    return null;
+  }
+
   return (
     <PageContainer>
       <div className="rounded-xl border shadow px-6 py-8 bg-white">
-        {step === 0 && <Step1 onOk={next} />}
+        {step === 0 && <Step1 data={data} onOk={next} />}
         {step === 1 && <Step2 onOk={finish} onBack={back} />}
       </div>
     </PageContainer>
