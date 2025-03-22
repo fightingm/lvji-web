@@ -1,9 +1,9 @@
+import { contractView } from '@/services/ant-design-pro/api';
 import { FileDoneOutlined, FireOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { useParams } from '@umijs/max';
-import { Tabs, message } from 'antd';
-import { renderAsync } from 'docx-preview';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useRequest } from '@umijs/max';
+import { Tabs } from 'antd';
+import React, { useMemo, useState } from 'react';
 import AllTab from './components/AllTab';
 import Analysis from './components/Analysis';
 import Loading from './components/Loading';
@@ -26,99 +26,52 @@ import Loading from './components/Loading';
 const TableList: React.FC = () => {
   const [loading] = useState(false);
   const params = useParams();
+
+  const { data } = useRequest(contractView, {
+    defaultParams: [params.id!],
+  });
   const [mode, setMode] = useState(1);
+
+  //   const [items, setItems] = useState([]);
+  const items = useMemo(() => {
+    return data?.reviewChunkRespDTOList ?? [];
+  }, [data]);
+
   // 合同标的
-  const [bd, setBd] = useState('');
+  const bd = useMemo(() => {
+    try {
+      return JSON.parse(data?.reviewResultNewRespDTO.objectRule).mdContent;
+    } catch (error) {
+      return '';
+    }
+  }, [data]);
 
   // 目的审查
-  const [md, setMd] = useState([]);
+  const md = useMemo(() => {
+    try {
+      return JSON.parse(data?.reviewResultNewRespDTO.purposeRule).objectives;
+    } catch (error) {
+      return [];
+    }
+  }, [data]);
 
   // 违约责任审查
-  const [wy, setWy] = useState();
-
-  // 程序性条款
-  //   const [_, setCx] = useState('');
+  const wy = useMemo(() => {
+    try {
+      return JSON.parse(data?.reviewResultNewRespDTO.violateRule).contractParties;
+    } catch (error) {
+      return [];
+    }
+  }, [data]);
 
   // 交易流程
-  const [lc, setLc] = useState([]);
-
-  const [path, setPath] = useState('');
-
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    const token = window.localStorage.getItem('token');
-    const wsParams = localStorage.getItem('reviewParams');
-    if (!token || !wsParams) {
-      return;
+  const lc = useMemo(() => {
+    try {
+      return JSON.parse(data?.reviewResultNewRespDTO.dealNodesRule).dealNodes;
+    } catch (error) {
+      return [];
     }
-
-    const ws = new WebSocket(
-      `wss://xj102db493504.vicp.fun/api/llm-service/review-contract/${
-        params.id
-      }?Authorization=${token.slice(7)}`,
-    );
-    ws.onopen = function () {
-      console.log('open', wsParams);
-      ws.send(wsParams);
-    };
-    ws.onmessage = function (evt) {
-      const data = JSON.parse(evt.data);
-      console.log('onmessage', data);
-      if (data.type) {
-        if (data.type === 'file') {
-          setPath(data.path);
-        } else if (data.type === '合同标的') {
-          setBd(data.mdContent);
-        } else if (data.type === '目的审查') {
-          //objective：标题 conditions：条件
-          setMd(data.objectives);
-        } else if (data.type === '违约责任审查') {
-          // contractee contractor : party responsibilities: [{condition, consequence, detail, original}]
-          setWy(data.contractParties);
-        } else if (data.type === '程序性条款审查') {
-          // contractClauses: [{clauseName, original, reviewResult, riskLevel, reviewBasics: [{type, detail, description}]}]
-          //   setCx(data.contractClauses);
-        } else if (data.type === '交易流程') {
-          //nodeName firstParty secondParty
-          setLc(data.dealNodes);
-        }
-      }
-      if (data.reviewType) {
-        setItems((v) => v.concat([data]));
-      }
-    };
-    ws.onerror = function (e) {
-      message.error('ws 接口报错了');
-      console.log('ws 接口报错了', e);
-    };
-    ws.onclose = function () {
-      //   message.error('ws 断开了');
-      console.log('ws 断开了');
-    };
-    return () => {
-      ws.close();
-    };
-  }, [params.id]);
-
-  useEffect(() => {
-    if (true) {
-      return;
-    }
-    // https://yema-1252530263.cos.ap-chengdu.myqcloud.com/test/67d53255533aeb080253ef2a.doc
-    // fetch('/test/67d53255533aeb080253ef2a.doc')
-    fetch('/1.docx')
-      .then((res) => {
-        console.log('xxxx', res);
-        return res.arrayBuffer();
-      })
-      .then((data) => {
-        return renderAsync(data, document.getElementById('docx') as HTMLElement);
-      })
-      .catch(function (error) {
-        console.log('xxxx', error);
-      });
-  }, [path]);
+  }, [data]);
 
   const [items1, items2, items3, items4, items5] = useMemo(() => {
     // 高风险，合同标的，合同条款，文字符号，自定义策略
@@ -190,10 +143,11 @@ const TableList: React.FC = () => {
                 className="[&_>.docx-wrapper]:p-0 [&_>.docx-wrapper]:bg-transparent h-screen overflow-auto"
             ></div> */}
             <iframe
-              src={`https://view.officeapps.live.com/op/view.aspx?src=${path}`}
+              src={`https://view.officeapps.live.com/op/view.aspx?src=${data?.filePath}`}
               width="100%"
               height="100%"
-              frameBorder="1"
+              frameBorder="0"
+              scrolling="auto"
             ></iframe>
           </div>
           <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">

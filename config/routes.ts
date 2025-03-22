@@ -52,6 +52,10 @@ export default [
         path: '/clm/contract/detail/:id',
         component: './ContractDetail',
       },
+      {
+        path: '/clm/contract/view/:id',
+        component: './ContractView',
+      },
     ],
   },
   {

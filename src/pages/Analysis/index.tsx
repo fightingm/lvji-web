@@ -1,10 +1,4 @@
-import {
-  addRule,
-  analysis,
-  analysisDetail,
-  removeRule,
-  updateRule,
-} from '@/services/ant-design-pro/api';
+import { addRule, getResultList, updateRule } from '@/services/ant-design-pro/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
   ModalForm,
@@ -13,7 +7,7 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
+import { FormattedMessage, Link, useIntl } from '@umijs/max';
 import { Button, Drawer, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import Detail from './components/Detail';
@@ -70,22 +64,22 @@ const handleUpdate = async (fields: FormValueType) => {
  *
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
+// const handleRemove = async (selectedRows: API.RuleListItem[]) => {
+//   const hide = message.loading('正在删除');
+//   if (!selectedRows) return true;
+//   try {
+//     await removeRule({
+//       key: selectedRows.map((row) => row.key),
+//     });
+//     hide();
+//     message.success('Deleted successfully and will refresh soon');
+//     return true;
+//   } catch (error) {
+//     hide();
+//     message.error('Delete failed, please try again');
+//     return false;
+//   }
+// };
 
 const TableList: React.FC = () => {
   /**
@@ -103,9 +97,9 @@ const TableList: React.FC = () => {
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.AnalysisListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.AnalysisListItem[]>([]);
+  //   const [selectedRowsState, setSelectedRows] = useState<API.AnalysisListItem[]>([]);
 
-  const [detail, setDetail] = useState<API.AnalysisListItem>();
+  const [detail] = useState<API.AnalysisListItem>();
 
   /**
    * @en-US International configuration
@@ -113,33 +107,34 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
 
-  async function handleDetail(row: API.AnalysisListItem) {
-    setShowDetail(true);
-    try {
-      const result = await analysisDetail(row.id);
-      setDetail(result);
-    } catch (error) {
-      message.error('查看失败，请重试');
-      setShowDetail(false);
-    }
-  }
+  //   async function handleDetail(row: API.AnalysisListItem) {
+  //     setShowDetail(true);
+  //     try {
+  //       const result = await analysisDetail(row.id);
+  //       setDetail(result);
+  //     } catch (error) {
+  //       message.error('查看失败，请重试');
+  //       setShowDetail(false);
+  //     }
+  //   }
 
   const columns: ProColumns<API.AnalysisListItem>[] = [
     {
       title: '合同标题',
-      dataIndex: 'contract_name',
+      dataIndex: 'contractName',
       render: (dom) => {
         return <span className="font-medium">{dom}</span>;
       },
+      search: false,
     },
     {
       title: '文件名称',
-      dataIndex: 'file_name',
+      dataIndex: 'fileName',
       search: false,
     },
     {
       title: '分析主体',
-      dataIndex: 'contract_party',
+      dataIndex: 'contractParty',
       search: false,
     },
     {
@@ -147,24 +142,24 @@ const TableList: React.FC = () => {
       dataIndex: 'status',
       hideInForm: true,
       search: false,
-      valueEnum: {
-        PROCESSING: {
-          text: '进行中',
-          status: 'Processing',
-        },
-        SUCCESS: {
-          text: '成功',
-          status: 'Success',
-        },
-        FAILED: {
-          text: '失败',
-          status: 'Error',
-        },
-      },
+      //   valueEnum: {
+      //     PROCESSING: {
+      //       text: '进行中',
+      //       status: 'Processing',
+      //     },
+      //     SUCCESS: {
+      //       text: '成功',
+      //       status: 'Success',
+      //     },
+      //     FAILED: {
+      //       text: '失败',
+      //       status: 'Error',
+      //     },
+      //   },
     },
     {
       title: '审查时间',
-      dataIndex: 'created_at',
+      dataIndex: 'createTimeStamp',
       valueType: 'dateTime',
       search: false,
     },
@@ -173,33 +168,27 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <Button
-          key="view"
-          size="small"
-          color="primary"
-          variant="link"
-          onClick={() => handleDetail(record)}
-        >
-          查看
+        <Button key="view" size="small" color="primary" variant="link">
+          <Link to={`/clm/contract/view/${record.reviewId}`}>查看</Link>
         </Button>,
-        <Button
-          key="report"
-          size="small"
-          color="primary"
-          variant="link"
-          onClick={() => handleDetail(record)}
-        >
-          查看报告
-        </Button>,
-        <Button
-          key="export"
-          size="small"
-          color="primary"
-          variant="link"
-          onClick={() => handleDetail(record)}
-        >
-          导出报告
-        </Button>,
+        // <Button
+        //   key="report"
+        //   size="small"
+        //   color="primary"
+        //   variant="link"
+        //   onClick={() => handleDetail(record)}
+        // >
+        //   查看报告
+        // </Button>,
+        // <Button
+        //   key="export"
+        //   size="small"
+        //   color="primary"
+        //   variant="link"
+        //   onClick={() => handleDetail(record)}
+        // >
+        //   导出报告
+        // </Button>,
       ],
     },
   ];
@@ -215,7 +204,7 @@ const TableList: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className="rounded-xl border bg-card text-card-foreground shadow">
+        {/* <div className="rounded-xl border bg-card text-card-foreground shadow">
           <div className="flex flex-col space-y-1.5 p-6 pb-2">
             <p className="text-sm text-muted-foreground">已分析合同</p>
             <h3 className="font-semibold tracking-tight text-4xl">0份</h3>
@@ -232,18 +221,22 @@ const TableList: React.FC = () => {
           <div className="p-6 pt-0">
             <div className="text-xs text-muted-foreground">预计时间0分钟</div>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="mt-4">
         <ProTable<API.AnalysisListItem, API.PageParams>
           headerTitle="审查结果列表"
           actionRef={actionRef}
           rowKey="key"
-          search={{
-            labelWidth: 120,
-          }}
+          search={false}
           toolbar={{ settings: undefined }}
-          request={analysis}
+          request={async (...args) => {
+            const res = await getResultList(...args);
+            return {
+              data: res.data?.records ?? [],
+              total: res.data?.total ?? 0,
+            };
+          }}
           columns={columns}
         />
       </div>

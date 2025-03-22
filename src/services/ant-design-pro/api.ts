@@ -110,7 +110,13 @@ export async function contractDetail(id: string) {
 }
 
 export async function contractPre(id: string) {
-  return request<{ data: API.ContractListItem }>(`/api/llm-service/pre/review/${id}`, {
+  return request(`/api/llm-service/pre/review/${id}`, {
+    method: 'GET',
+  });
+}
+
+export async function contractView(id: string) {
+  return request(`/api/llm-service/get/reviewed/${id}`, {
     method: 'GET',
   });
 }
@@ -301,5 +307,21 @@ export async function uploadContract(file: File) {
     method: 'POST',
     data: formData,
     requestType: 'form',
+  });
+}
+
+export async function getResultList(
+  params: {
+    current?: number;
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.RuleList>('/api/llm-service/resultList', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
   });
 }

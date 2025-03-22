@@ -2,12 +2,7 @@ import { Footer } from '@/components';
 import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
-import {
-  LoginForm,
-  ProFormCaptcha,
-  ProFormCheckbox,
-  ProFormText,
-} from '@ant-design/pro-components';
+import { LoginForm, ProFormCaptcha, ProFormText } from '@ant-design/pro-components';
 import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
 import { createStyles } from 'antd-style';
@@ -133,8 +128,8 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
-          subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          title="律己 AI"
+          //   subTitle="登录"
           initialValues={{
             autoLogin: true,
           }}
@@ -151,10 +146,10 @@ const Login: React.FC = () => {
                 key: 'account',
                 label: '账户密码登录',
               },
-              {
-                key: 'mobile',
-                label: '手机号登录',
-              },
+              //   {
+              //     key: 'mobile',
+              //     label: '手机号登录',
+              //   },
             ]}
           />
 
@@ -286,7 +281,7 @@ const Login: React.FC = () => {
               />
             </>
           )}
-          <div
+          {/* <div
             style={{
               marginBottom: 24,
             }}
@@ -301,7 +296,7 @@ const Login: React.FC = () => {
             >
               <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
             </a>
-          </div>
+          </div> */}
         </LoginForm>
       </div>
       <Footer />

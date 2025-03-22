@@ -5,6 +5,8 @@ import { useNavigate, useParams, useRequest } from '@umijs/max';
 import { Button, Input, Select } from 'antd';
 import React, { useState } from 'react';
 
+const scales = ['强势', '中立', '弱势'];
+
 function Step1(props) {
   const [position, setPosition] = useState(0);
   const [checkScale, setCheckScale] = useState(0);
@@ -21,10 +23,10 @@ function Step1(props) {
 
   function confirm() {
     props.onOk({
-      position,
-      checkScale,
-      strategy,
-      annotations,
+      reviewStance: position === 0 ? data.partyA : data.partyB,
+      scale: scales[checkScale],
+      strategyId: strategy,
+      reviewer: annotations,
     });
   }
   return (
@@ -37,7 +39,7 @@ function Step1(props) {
             </div>
             <div className="mt-1 pl-[14px] text-[#86909c] text-sm">选定你的合同审查立场</div>
           </div>
-          <div className="text-base font-bold">劳动合同</div>
+          <div className="text-base font-bold">{data.contractType}</div>
         </div>
         <div className="flex items-center justify-center gap-x-8 mt-5">
           <div
@@ -158,37 +160,38 @@ const list = [
   {
     label: '标的审查',
     desc: '系统分析合同标的类型及标的详情，智能分析标的条款可能存在的风险并进行审查修改。',
-    value: 'aaa',
+    value: 'objectRule',
     checked: true,
   },
   {
     label: '目的审查',
     desc: '系统基于审查立场分析其通过合同希望实现的目的以及对应需要满足的条件，进一步分析合同中对应的权利义务条款是否存在风险并进行审查修改。',
-    value: 'bbb',
+    value: 'purposeRule',
     checked: true,
   },
-  {
-    label: '主体审查',
-    desc: '调取合同相对方的信息，分析相关主体的资信能力以及是否具备合同签署的资质或许可。',
-    value: 'ccc',
-    checked: true,
-  },
+  //   {
+  //     label: '主体审查',
+  //     desc: '调取合同相对方的信息，分析相关主体的资信能力以及是否具备合同签署的资质或许可。',
+  //     value: 'ccc',
+  //     checked: true,
+  //   },
   {
     label: '违约责任',
     desc: '分析我方及相对方在合同中的义务及对应的违约责任条款安排，并判断相关条款安排是否存在风险。',
-    value: 'ddd',
+    value: 'violateRule',
     checked: true,
   },
   {
     label: '程序性条款审查',
     desc: '判断合同中是否包含鉴于、免责、通知与送达、争议解决、保密、效力、附件、签署等程序性条款，并分析是否存在风险。',
-    value: 'eee',
+    value: 'clauseRule',
     checked: true,
   },
   {
-    label: '文字符号审查',
-    desc: '分析合同内容中是否存在未使用法言法语、过于开放性描述、指代不明确、表述存在歧义、前后不统一、表述不规范等风险。',
-    value: 'fff',
+    label: '交易节点规则',
+    desc: '交易节点规则审查。',
+    value: 'dealNodesRule',
+    checked: true,
   },
 ];
 
@@ -196,7 +199,14 @@ function Step2(props) {
   const [items, setItems] = useState(list);
 
   function confirm() {
-    props.onOk(items.filter((item) => item.checked).map((item) => item.value));
+    props.onOk(
+      items
+        .filter((item) => item.checked)
+        .reduce((pre, cur) => {
+          pre[cur.value] = true;
+          return pre;
+        }, {}),
+    );
   }
   function check(value: string) {
     setItems(
@@ -268,20 +278,27 @@ const TableList: React.FC = () => {
   const { data } = useRequest(contractPre, {
     defaultParams: [params.id!],
   });
-
-  console.log('xxx', data);
+  const [step1Data, setStep1Data] = useState({});
 
   function next(value) {
-    console.log('xxx', value);
+    setStep1Data(value);
     setStep(1);
   }
   function back() {
     setStep(0);
   }
   function finish(value) {
-    console.log('xxx', value);
-    // setStep(0);
-    navigate('/clm/contract/detail');
+    const reviewParams = {
+      partyA: data.partyA,
+      partyB: data.partyB,
+      contractType: data.contractType,
+      ...step1Data,
+      ...value,
+    };
+    localStorage.setItem('reviewParams', JSON.stringify(reviewParams));
+    if (data.reviewResultNewId) {
+      navigate(`/clm/contract/detail/${data.reviewResultNewId}`);
+    }
   }
 
   if (!data) {
