@@ -75,6 +75,11 @@ const Regist: React.FC = () => {
           }}
           logo={<img alt="logo" src="/logo.svg" />}
           title="邦盛 AI"
+          submitter={{
+            searchConfig: {
+              submitText: '注册',
+            },
+          }}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
           }}
