@@ -1,4 +1,3 @@
-import { Footer } from '@/components';
 import { regist } from '@/services/ant-design-pro/api';
 import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText } from '@ant-design/pro-components';
@@ -75,7 +74,7 @@ const Regist: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="律己AI"
+          title="邦盛 AI"
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
           }}
@@ -129,7 +128,7 @@ const Regist: React.FC = () => {
           />
         </LoginForm>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { Footer } from '@/components';
 import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
 import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
@@ -128,7 +127,7 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="律己 AI"
+          title="邦盛 AI"
           //   subTitle="登录"
           initialValues={{
             autoLogin: true,
@@ -299,7 +298,7 @@ const Login: React.FC = () => {
           </div> */}
         </LoginForm>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

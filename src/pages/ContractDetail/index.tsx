@@ -54,7 +54,7 @@ const TableList: React.FC = () => {
     }
 
     const ws = new WebSocket(
-      `wss://xj102db493504.vicp.fun/api/llm-service/review-contract/${
+      `ws://10.220.138.89:444/api/llm-service/review-contract/${
         params.id
       }?Authorization=${token.slice(7)}`,
     );
