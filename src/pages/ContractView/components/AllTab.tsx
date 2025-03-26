@@ -121,7 +121,7 @@ export default function (props) {
     return <Skeleton />;
   }
   return (
-    <div className="[&_.red-txt]:text-red-600">
+    <div className="[&_.red-txt]:text-red-600 [&_.green-txt]:text-blue-400 [&_.green-txt]:line-through">
       <Collapse
         bordered={false}
         defaultActiveKey={['0']}
