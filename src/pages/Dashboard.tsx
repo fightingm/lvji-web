@@ -97,7 +97,7 @@ const Welcome: React.FC = () => {
                 <div className="tracking-tight text-sm font-medium">{item.name}</div>
               </div>
               <div className="p-6 pt-0">
-                <div className="text-2xl font-bold">{item.value}</div>
+                <div className="text-2xl font-bold overflow-hidden text-ellipsis">{item.value}</div>
                 <p className="text-xs text-muted-foreground">{item.desc}</p>
               </div>
             </div>

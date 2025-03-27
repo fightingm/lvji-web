@@ -310,18 +310,13 @@ export async function uploadContract(file: File) {
   });
 }
 
-export async function getResultList(
-  params: {
-    current?: number;
-    pageSize?: number;
-  },
-  options?: { [key: string]: any },
-) {
+export async function getResultList(params) {
   return request<API.RuleList>('/api/llm-service/resultList', {
     method: 'GET',
     params: {
-      ...params,
+      current: params.current,
+      size: params.pageSize,
+      words: params.fileName,
     },
-    ...(options || {}),
   });
 }

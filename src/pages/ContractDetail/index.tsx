@@ -24,7 +24,8 @@ import Loading from './components/Loading';
 // };
 
 const TableList: React.FC = () => {
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [task, setTask] = useState([]);
   const params = useParams();
   const [mode, setMode] = useState(1);
   // 合同标的
@@ -54,7 +55,7 @@ const TableList: React.FC = () => {
     }
 
     const ws = new WebSocket(
-      `ws://10.220.138.89:444/api/llm-service/review-contract/${
+      `wss://xj102db493504.vicp.fun/api/llm-service/review-contract/${
         params.id
       }?Authorization=${token.slice(7)}`,
     );
@@ -86,6 +87,13 @@ const TableList: React.FC = () => {
       }
       if (data.reviewType) {
         setItems((v) => v.concat([data]));
+      }
+      if (data.taskQueue) {
+        if (data.status) {
+          ws.close();
+        }
+        setLoading(!data.status);
+        setTask(data.taskQueue);
       }
     };
     ws.onerror = function (e) {
@@ -199,7 +207,9 @@ const TableList: React.FC = () => {
           <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">
             <div className="mr-4 flex-1 h-full overflow-auto [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
               {loading ? (
-                <Loading />
+                <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
+                  <Loading data={task} />
+                </div>
               ) : mode === 0 ? (
                 <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
                   <Tabs defaultActiveKey="1" items={tabsItem} />

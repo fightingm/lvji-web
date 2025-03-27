@@ -130,7 +130,6 @@ const TableList: React.FC = () => {
     {
       title: '文件名称',
       dataIndex: 'fileName',
-      search: false,
     },
     {
       title: '分析主体',
@@ -228,7 +227,6 @@ const TableList: React.FC = () => {
           headerTitle="审查结果列表"
           actionRef={actionRef}
           rowKey="key"
-          search={false}
           toolbar={{ settings: undefined }}
           request={async (...args) => {
             const res = await getResultList(...args);
