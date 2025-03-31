@@ -1,4 +1,4 @@
-import { addRule, getResultList, updateRule } from '@/services/ant-design-pro/api';
+import { addRule, getResultList, removeReview, updateRule } from '@/services/ant-design-pro/api';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import {
   ModalForm,
@@ -8,7 +8,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, Link, useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, Modal, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import Detail from './components/Detail';
 import type { FormValueType } from './components/UpdateForm';
@@ -58,29 +58,20 @@ const handleUpdate = async (fields: FormValueType) => {
   }
 };
 
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-// const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-//   const hide = message.loading('正在删除');
-//   if (!selectedRows) return true;
-//   try {
-//     await removeRule({
-//       key: selectedRows.map((row) => row.key),
-//     });
-//     hide();
-//     message.success('Deleted successfully and will refresh soon');
-//     return true;
-//   } catch (error) {
-//     hide();
-//     message.error('Delete failed, please try again');
-//     return false;
-//   }
-// };
-
+const handleRemove = async (row: API.AnalysisListItem) => {
+  const hide = message.loading('正在删除');
+  if (!row) return true;
+  try {
+    await removeReview(row.reviewId);
+    hide();
+    message.success('删除成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('删除失败，请重试');
+    return false;
+  }
+};
 const TableList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
@@ -117,6 +108,19 @@ const TableList: React.FC = () => {
   //       setShowDetail(false);
   //     }
   //   }
+
+  function handleDel(row: API.AnalysisListItem) {
+    Modal.confirm({
+      title: '确认删除审查结果?',
+      content: '删除后将不能再恢复数据.',
+      async onOk() {
+        const success = await handleRemove(row);
+        if (success) {
+          actionRef.current?.reload();
+        }
+      },
+    });
+  }
 
   const columns: ProColumns<API.AnalysisListItem>[] = [
     {
@@ -169,6 +173,15 @@ const TableList: React.FC = () => {
       render: (_, record) => [
         <Button key="view" size="small" color="primary" variant="link">
           <Link to={`/clm/contract/view/${record.reviewId}`}>查看</Link>
+        </Button>,
+        <Button
+          key="del"
+          size="small"
+          color="danger"
+          variant="link"
+          onClick={() => handleDel(record)}
+        >
+          删除
         </Button>,
         // <Button
         //   key="report"

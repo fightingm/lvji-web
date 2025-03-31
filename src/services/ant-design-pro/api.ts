@@ -136,6 +136,12 @@ export async function removeContract(id: string) {
   });
 }
 
+export async function removeReview(id: string) {
+  return request<Record<string, any>>(`/api/llm-service/delete/review/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 /** 获取审查结果列表 GET /api/analysis */
 export async function analysis(
   params: {

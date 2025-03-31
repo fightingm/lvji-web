@@ -142,6 +142,7 @@ declare namespace API {
 
   type AnalysisListItem = {
     id: string;
+    reviewId: string;
     contract_name: string;
     file_name: string;
     contract_party: string;
