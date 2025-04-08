@@ -12,7 +12,6 @@ export function RuleDrawer(props) {
   const { data: rules, run } = useRequest(ruleList, {
     manual: true,
   });
-  //   const [selectedRows, setSelectedRows] = useState<API.RuleListItem[]>(initSelected);
 
   const [keywords, setKeywords] = useState('');
 
@@ -73,9 +72,6 @@ export function RuleDrawer(props) {
   const onSelectChange = (_, newSelectedRows: API.RuleListItem[]) => {
     // 1: 4 5 6 2: 7 8 9
     setSelectedMap((v) => {
-      console.log('???', newSelectedRows);
-      console.log('???1', v.init);
-      console.log('???2', rules?.rulesDetailRecords);
       // 这里要把init里面当前tab下的所有都去掉
       return {
         ...v,
@@ -85,10 +81,7 @@ export function RuleDrawer(props) {
         [selected]: newSelectedRows,
       };
     });
-    // setSelectedRows(newSelectedRows);
   };
-
-  console.log('xxxx', selectedMap);
 
   const selectedRowKeys =
     Object.values(selectedMap)
