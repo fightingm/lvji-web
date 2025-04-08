@@ -12,11 +12,13 @@ export function RuleDrawer(props) {
   const { data: rules, run } = useRequest(ruleList, {
     manual: true,
   });
-  const [selectedRows, setSelectedRows] = useState<API.RuleListItem[]>(initSelected);
+  //   const [selectedRows, setSelectedRows] = useState<API.RuleListItem[]>(initSelected);
 
   const [keywords, setKeywords] = useState('');
 
   const [selected, setSelected] = useState('');
+
+  const [selectedMap, setSelectedMap] = useState<any>({});
 
   const ruleColumns = [
     {
@@ -63,15 +65,35 @@ export function RuleDrawer(props) {
     run(item.key);
   }
   function confirm() {
-    onChange(selectedRows);
+    const items = Object.values(selectedMap).flat();
+    onChange(items);
     onClose();
   }
 
   const onSelectChange = (_, newSelectedRows: API.RuleListItem[]) => {
-    setSelectedRows(newSelectedRows);
+    // 1: 4 5 6 2: 7 8 9
+    setSelectedMap((v) => {
+      console.log('???', newSelectedRows);
+      console.log('???1', v.init);
+      console.log('???2', rules?.rulesDetailRecords);
+      // 这里要把init里面当前tab下的所有都去掉
+      return {
+        ...v,
+        init: v['init'].filter(
+          (item) => !rules?.rulesDetailRecords.find((row) => row.id === item.id),
+        ),
+        [selected]: newSelectedRows,
+      };
+    });
+    // setSelectedRows(newSelectedRows);
   };
 
-  const selectedRowKeys = selectedRows.map((item) => item.id);
+  console.log('xxxx', selectedMap);
+
+  const selectedRowKeys =
+    Object.values(selectedMap)
+      .flat()
+      .map((item) => item.id) ?? [];
 
   const rowSelection = {
     selectedRowKeys,
@@ -79,7 +101,7 @@ export function RuleDrawer(props) {
   };
 
   useEffect(() => {
-    setSelectedRows(initSelected);
+    setSelectedMap({ init: initSelected });
   }, [initSelected]);
 
   return (
