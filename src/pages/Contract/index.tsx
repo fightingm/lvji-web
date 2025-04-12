@@ -92,6 +92,7 @@ const TableList: React.FC = () => {
     if (success) {
       handleUpdateModalOpen(false);
       setDetail(undefined);
+      setShowDetail(false);
       if (actionRef.current) {
         actionRef.current.reload();
       }

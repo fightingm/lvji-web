@@ -94,6 +94,19 @@ function Item({ data }) {
   );
 }
 
+function Title({ index, data }) {
+  return (
+    <div className="flex items-center gap-x-1">
+      {`${index + 1}. ${data.reviewSummary}`}
+      {data.riskLevel === '高风险' && (
+        <div className="px-[2px] text-red-500 border-red-500 border bg-red-100 font-medium rounded">
+          高风险
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function (props) {
   const items = useMemo(() => {
     return props.items.map((item, index) => {
@@ -111,11 +124,14 @@ export default function (props) {
       };
       return {
         key: index,
-        label: item.reviewSummary,
+        label: <Title index={index} data={item} />,
         children: <Item data={data} />,
         style: panelStyle,
       };
     });
+  }, [props.items]);
+  const defaultKeys = useMemo(() => {
+    return props.items.map((_, index) => index);
   }, [props.items]);
   if (!items.length) {
     return <Skeleton />;
@@ -124,7 +140,7 @@ export default function (props) {
     <div className="[&_.red-txt]:text-red-600 [&_.green-txt]:text-blue-400 [&_.green-txt]:line-through">
       <Collapse
         bordered={false}
-        defaultActiveKey={['0']}
+        defaultActiveKey={defaultKeys}
         expandIconPosition="end"
         style={{ background: '#f7f8fa' }}
         items={items}

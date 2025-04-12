@@ -40,7 +40,7 @@ const TableList: React.FC = () => {
           submitter={{
             searchConfig: {
               resetText: '取消',
-              submitText: '修改',
+              submitText: '确认',
             },
             submitButtonProps: {
               loading,

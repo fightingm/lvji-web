@@ -1,11 +1,11 @@
+import AllTab from '@/components/contract/AllTab';
+import Analysis from '@/components/contract/Analysis';
 import { contractView } from '@/services/ant-design-pro/api';
 import { FileDoneOutlined, FireOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useParams, useRequest } from '@umijs/max';
 import { Tabs } from 'antd';
 import React, { useMemo, useState } from 'react';
-import AllTab from './components/AllTab';
-import Analysis from './components/Analysis';
 import Loading from './components/Loading';
 
 // const wsParams = {
@@ -152,14 +152,14 @@ const TableList: React.FC = () => {
           </div>
           <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">
             <div className="mr-4 flex-1 h-full overflow-auto [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
-              {loading ? (
+              {mode === 1 ? (
+                <Analysis bd={bd} lc={lc} md={md} wy={wy} />
+              ) : loading ? (
                 <Loading />
-              ) : mode === 0 ? (
+              ) : (
                 <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
                   <Tabs defaultActiveKey="1" items={tabsItem} />
                 </div>
-              ) : (
-                <Analysis bd={bd} lc={lc} md={md} wy={wy} />
               )}
             </div>
             <div className="shrink-0 w-[60px] bg-[#f2f3f5] px-2 py-6 h-screen overflow-hidden">

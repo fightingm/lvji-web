@@ -143,7 +143,9 @@ export default function (props) {
           </div>
           <div className="text-lg font-bold ml-2">合同标的</div>
         </div>
-        <div className="pb-3 markdown-body">{bd ? <Markdown>{bd}</Markdown> : <Skeleton />}</div>
+        <div className="pb-3 markdown-body">
+          {bd === null ? '合同中未找到' : bd ? <Markdown>{bd}</Markdown> : <Skeleton />}
+        </div>
       </div>
       <div className="border border-[#c9cdd4] rounded-md bg-white p-4 mt-4">
         <div className="flex items-center mb-5 h-16 border-b-[#e5e6eb] border-b">
@@ -153,7 +155,9 @@ export default function (props) {
           <div className="text-lg font-bold ml-2">交易流程</div>
         </div>
         <div className="pb-3">
-          {!!items.length ? (
+          {lc === null ? (
+            '合同中未找到'
+          ) : !!items.length ? (
             <Collapse
               ghost
               defaultActiveKey={defaultKeys}
@@ -174,7 +178,9 @@ export default function (props) {
           <div className="text-lg font-bold ml-2">合同目的</div>
         </div>
         <div className="pb-3">
-          {!!mdItems.length ? (
+          {md === null ? (
+            '合同中未找到'
+          ) : !!mdItems.length ? (
             <Collapse
               ghost
               defaultActiveKey={defaultMdKeys}
@@ -195,7 +201,9 @@ export default function (props) {
           <div className="text-lg font-bold ml-2">违约责任</div>
         </div>
         <div className="pb-3 [&_.ant-collapse-borderless]:!bg-transparent ">
-          {!!wyItems.length ? (
+          {wy === null ? (
+            '合同中未找到'
+          ) : !!wyItems.length ? (
             <Collapse
               bordered={false}
               defaultActiveKey={[0, 1]}

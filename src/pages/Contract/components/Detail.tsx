@@ -52,11 +52,11 @@ export default function Detail(props: { data: API.ContractListItem; showUpdate: 
             </div>
             <div className="flex justify-between items-center text-sm">
               <div className="text-[#71717a]">生效日期</div>
-              <div>{dayjs(data.startTime).format('YYYY-MM-DD')}</div>
+              <div>{data.startTime && dayjs(data.startTime).format('YYYY-MM-DD')}</div>
             </div>
             <div className="flex justify-between items-center text-sm">
               <div className="text-[#71717a]">终止日期</div>
-              <div>{dayjs(data.endTime).format('YYYY-MM-DD')}</div>
+              <div>{data.endTime && dayjs(data.endTime).format('YYYY-MM-DD')}</div>
             </div>
           </div>
         </div>

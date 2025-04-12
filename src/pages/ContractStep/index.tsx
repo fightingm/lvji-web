@@ -8,11 +8,11 @@ import React, { useState } from 'react';
 const scales = ['强势', '中立', '弱势'];
 
 function Step1(props) {
-  const [position, setPosition] = useState(0);
-  const [checkScale, setCheckScale] = useState(0);
-  const [strategy, setStragety] = useState();
-  const [annotations, setAnnotations] = useState('');
-  const data = props.data;
+  const { data, form } = props;
+  const [position, setPosition] = useState(form.position ?? 0);
+  const [checkScale, setCheckScale] = useState(form.checkScale ?? 0);
+  const [strategy, setStragety] = useState(form.strategy);
+  const [annotations, setAnnotations] = useState(form.annotations ?? '');
 
   const { data: strategyArr } = useRequest(strategyList);
 
@@ -23,10 +23,18 @@ function Step1(props) {
 
   function confirm() {
     props.onOk({
-      reviewStance: position === 0 ? data.partyA : data.partyB,
-      scale: scales[checkScale],
-      strategyId: strategy,
-      reviewer: annotations,
+      data: {
+        reviewStance: position === 0 ? data.partyA : data.partyB,
+        scale: scales[checkScale],
+        strategyId: strategy,
+        reviewer: annotations,
+      },
+      form: {
+        position,
+        checkScale,
+        strategy,
+        annotations,
+      },
     });
   }
   return (
@@ -279,9 +287,11 @@ const TableList: React.FC = () => {
     defaultParams: [params.id!],
   });
   const [step1Data, setStep1Data] = useState({});
+  const [step1Form, setStep1Form] = useState({});
 
   function next(value) {
-    setStep1Data(value);
+    setStep1Data(value.data);
+    setStep1Form(value.form);
     setStep(1);
   }
   function back() {
@@ -308,7 +318,7 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       <div className="rounded-xl border shadow px-6 py-8 bg-white">
-        {step === 0 && <Step1 data={data} onOk={next} />}
+        {step === 0 && <Step1 form={step1Form} data={data} onOk={next} />}
         {step === 1 && <Step2 onOk={finish} onBack={back} />}
       </div>
     </PageContainer>
