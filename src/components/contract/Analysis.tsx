@@ -80,38 +80,42 @@ export default function (props) {
   const { bd, lc, md, wy } = props;
 
   const items = useMemo(() => {
-    return lc.map((item, index) => {
-      return {
-        key: index,
-        label: <div className="text-base font-bold">{item.nodeName}</div>,
-        children: <LcItem data={item} />,
-      };
-    });
+    return (
+      lc?.map((item, index) => {
+        return {
+          key: index,
+          label: <div className="text-base font-bold">{item.nodeName}</div>,
+          children: <LcItem data={item} />,
+        };
+      }) ?? []
+    );
   }, [lc]);
   const defaultKeys = useMemo(() => {
-    return new Array(lc.length).fill(0).map((item, index) => index);
+    return lc ? new Array(lc.length).fill(0).map((item, index) => index) : [];
   }, [lc]);
 
   const mdItems = useMemo(() => {
-    return md.map((item, index) => {
-      return {
-        key: index,
-        label: <div className="text-base font-bold">{item.objective}</div>,
-        children: (
-          <ul>
-            {item.conditions.map((inner, idx) => (
-              <li key={idx} className="list-disc ml-6 text-base text-[#4e5969]">
-                {inner}
-              </li>
-            ))}
-          </ul>
-        ),
-      };
-    });
+    return (
+      md?.map((item, index) => {
+        return {
+          key: index,
+          label: <div className="text-base font-bold">{item.objective}</div>,
+          children: (
+            <ul>
+              {item.conditions.map((inner, idx) => (
+                <li key={idx} className="list-disc ml-6 text-base text-[#4e5969]">
+                  {inner}
+                </li>
+              ))}
+            </ul>
+          ),
+        };
+      }) ?? []
+    );
   }, [md]);
 
   const defaultMdKeys = useMemo(() => {
-    return new Array(md.length).fill(0).map((item, index) => index);
+    return md ? new Array(md.length).fill(0).map((item, index) => index) : [];
   }, [md]);
 
   const wyItems = useMemo(() => {
