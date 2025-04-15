@@ -1,4 +1,5 @@
 import {
+  removeBigRule,
   removeStrategy,
   scenarioAdd,
   scenarioList,
@@ -53,6 +54,21 @@ const handleRemoveStrategy = async (row: API.StrategyItem) => {
   }
 };
 
+const handleRemoveRule = async (row: API.ScenarioItem) => {
+  const hide = message.loading('正在删除');
+  if (!row) return true;
+  try {
+    await removeBigRule(row.id);
+    hide();
+    message.success('删除成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('删除失败，请重试');
+    return false;
+  }
+};
+
 const TableList: React.FC = () => {
   const [tab, setTab] = useState(0);
   const [ruleKey, setRuleKey] = useState('');
@@ -78,7 +94,11 @@ const TableList: React.FC = () => {
   }
 
   const filterRules = useMemo(() => {
-    return rules?.records.filter((item) => item.name.includes(ruleKey)) ?? [];
+    return (
+      rules?.records
+        .filter((item) => item.name.includes(ruleKey))
+        .sort((a, b) => b.createdSource - a.createdSource) ?? []
+    );
   }, [rules, ruleKey]);
 
   const filterStrategies = useMemo(() => {
@@ -89,6 +109,13 @@ const TableList: React.FC = () => {
     const success = await handleRemoveStrategy(row);
     if (success) {
       refreshStrategy();
+    }
+  }
+
+  async function handleDelRule(row: API.ScenarioItem) {
+    const success = await handleRemoveRule(row);
+    if (success) {
+      refresh();
     }
   }
 
@@ -155,7 +182,13 @@ const TableList: React.FC = () => {
               renderItem={(item) => (
                 <List.Item>
                   <Card title={item.name}>
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
+                      {item.createdSource !== 0 && (
+                        <Button danger onClick={() => handleDelRule(item)}>
+                          删除规则
+                        </Button>
+                      )}
+
                       <Button disabled={item.createdSource === 0}>
                         <Link to={`/clm/config/rule-edit/${item.id}`}>配置规则</Link>
                       </Button>

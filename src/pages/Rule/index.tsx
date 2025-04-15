@@ -2,12 +2,10 @@ import { addRule, removeRule, ruleList, updateRule } from '@/services/ant-design
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useParams, useRequest } from '@umijs/max';
-import { Button, Input, Table, Tag, Typography, message } from 'antd';
+import { Button, Input, Table, Tag, message } from 'antd';
 import React, { useMemo, useState } from 'react';
 import AddForm from './components/AddFrom';
 import UpdateForm from './components/UpdateForm';
-
-const { Text } = Typography;
 
 const handleRemove = async (row: API.RuleTypeItem) => {
   const hide = message.loading('正在删除');
@@ -184,7 +182,6 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <Text type="secondary">系统创建的规则无法删除和修改.</Text>
       <div className="mt-4 flex items-center justify-between">
         <Input
           value={keywords}

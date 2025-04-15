@@ -176,7 +176,7 @@ const TableList: React.FC = () => {
   ];
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  //   const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const uploadProps: UploadProps = {
     onRemove: (file) => {
@@ -197,7 +197,7 @@ const TableList: React.FC = () => {
   };
 
   const handleUpload = () => {
-    // setUploading(true);
+    setUploading(true);
     const fileRequest = fileList.map((item) => uploadContract(item as unknown as File));
     Promise.all(fileRequest)
       .then(() => {
@@ -210,7 +210,7 @@ const TableList: React.FC = () => {
       })
       .finally(() => {
         actionRef.current?.reload();
-        // setUploading(false);
+        setUploading(false);
       });
   };
 
@@ -279,6 +279,7 @@ const TableList: React.FC = () => {
         width={600}
         open={uploadModalVisible}
         onOk={handleUpload}
+        okButtonProps={{ loading: uploading }}
         onCancel={() => setUploadModalVisible(false)}
       >
         <div className="py-4">

@@ -99,7 +99,7 @@ function Title({ index, data }) {
     <div className="flex items-center gap-x-1">
       {`${index + 1}. ${data.reviewSummary}`}
       {data.riskLevel === '高风险' && (
-        <div className="px-[2px] text-red-500 border-red-500 border bg-red-100 font-medium rounded">
+        <div className="px-[2px] text-red-500 border-red-500 border bg-red-100 font-medium rounded whitespace-nowrap">
           高风险
         </div>
       )}

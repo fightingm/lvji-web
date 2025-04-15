@@ -267,6 +267,12 @@ export async function removeStrategy(id: string) {
   });
 }
 
+export async function removeBigRule(id: string) {
+  return request(`/api/rule-service/table/del/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 /**
  * 修改策略
  */
