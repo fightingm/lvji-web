@@ -145,7 +145,9 @@ const TableList: React.FC = () => {
               renderItem={(item) => (
                 <List.Item>
                   <Card title={item.name}>
-                    <div className="text-sm">{item.description}</div>
+                    <div className="h-10 text-sm line-clamp-2 overflow-hidden">
+                      {item.description}
+                    </div>
                     <div className="mt-2 flex justify-end gap-2">
                       <Button danger onClick={() => handleDelStrategy(item)}>
                         删除策略
