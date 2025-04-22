@@ -142,6 +142,13 @@ export async function removeReview(id: string) {
   });
 }
 
+export async function downloadReview(id: string) {
+  return request<Record<string, any>>(`/api/llm-service/download/${id}`, {
+    method: 'GET',
+    responseType: 'blob',
+  });
+}
+
 /** 获取审查结果列表 GET /api/analysis */
 export async function analysis(
   params: {
