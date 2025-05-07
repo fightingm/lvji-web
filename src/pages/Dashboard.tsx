@@ -24,11 +24,6 @@ const Welcome: React.FC = () => {
       value: `${data?.expireNumber ?? '--'}个`,
       desc: '到期合同数量',
     },
-    {
-      name: '合同总金额',
-      value: `¥${data?.totalAmount ?? '--'}`,
-      desc: '合同对价总额',
-    },
   ];
 
   const lineConfig = useMemo(() => {
@@ -90,7 +85,7 @@ const Welcome: React.FC = () => {
   return (
     <PageContainer>
       <div className="grid gap-4 p-4 sm:px-6 sm:py-0">
-        <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-3">
           {list.map((item, index) => (
             <div key={index} className="rounded-xl border bg-card text-card-foreground shadow">
               <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">

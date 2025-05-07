@@ -1,7 +1,7 @@
 import { contractPre, strategyList } from '@/services/ant-design-pro/api';
-import { BulbOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { BulbOutlined, CheckCircleFilled, PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
-import { useNavigate, useParams, useRequest } from '@umijs/max';
+import { Link, useNavigate, useParams, useRequest } from '@umijs/max';
 import { Button, Input, Select } from 'antd';
 import React, { useState } from 'react';
 
@@ -153,6 +153,11 @@ function Step1(props) {
             onChange={setStragety}
             options={selectOptions}
           />
+        </div>
+        <div className="mt-5">
+          <Button icon={<PlusOutlined />} iconPosition="start">
+            <Link to="/clm/config/strategy-add">新增策略</Link>
+          </Button>
         </div>
       </div>
       <div className="mt-12 flex justify-center">

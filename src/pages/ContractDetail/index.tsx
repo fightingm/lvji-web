@@ -27,7 +27,7 @@ const TableList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [task, setTask] = useState([]);
   const params = useParams();
-  const [mode, setMode] = useState(1);
+  const [mode, setMode] = useState(0);
   // 合同标的
   const [bd, setBd] = useState('');
 

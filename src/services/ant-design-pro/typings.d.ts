@@ -117,6 +117,7 @@ declare namespace API {
     createTimeStamp: number;
     type: string;
     startTime: number;
+    reviewExpireTime: number;
     endTime: number;
     file_list: File[];
     parta: string;

@@ -183,20 +183,20 @@ const TableList: React.FC = () => {
       dataIndex: 'status',
       hideInForm: true,
       search: false,
-      //   valueEnum: {
-      //     PROCESSING: {
-      //       text: '进行中',
-      //       status: 'Processing',
-      //     },
-      //     SUCCESS: {
-      //       text: '成功',
-      //       status: 'Success',
-      //     },
-      //     FAILED: {
-      //       text: '失败',
-      //       status: 'Error',
-      //     },
-      //   },
+      valueEnum: {
+        1: {
+          text: '进行中',
+          status: 'Processing',
+        },
+        0: {
+          text: '成功',
+          status: 'Success',
+        },
+        2: {
+          text: '失败',
+          status: 'Error',
+        },
+      },
     },
     {
       title: '审查时间',
@@ -221,15 +221,11 @@ const TableList: React.FC = () => {
         >
           删除
         </Button>,
-        // <Button
-        //   key="report"
-        //   size="small"
-        //   color="primary"
-        //   variant="link"
-        //   onClick={() => handleDetail(record)}
-        // >
-        //   查看报告
-        // </Button>,
+        record.status === '2' && (
+          <Button key="check" size="small" color="primary" variant="link">
+            <Link to={`/clm/contract/step/${record.fileId}`}>重新审查</Link>
+          </Button>
+        ),
         <Button
           key="export"
           size="small"

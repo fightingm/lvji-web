@@ -30,7 +30,7 @@ const TableList: React.FC = () => {
   const { data } = useRequest(contractView, {
     defaultParams: [params.id!],
   });
-  const [mode, setMode] = useState(1);
+  const [mode, setMode] = useState(0);
 
   //   const [items, setItems] = useState([]);
   const items = useMemo(() => {

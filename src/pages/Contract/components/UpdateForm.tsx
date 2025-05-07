@@ -39,6 +39,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       ...fields,
       startTime: dayjs(fields.startTime).valueOf(),
       endTime: dayjs(fields.endTime).valueOf(),
+      reviewExpireTime: dayjs(fields.reviewExpireTime).valueOf(),
     });
   }
   async function typeListReq() {
@@ -67,6 +68,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
       <ProFormSelect name="stage" label="合同阶段" valueEnum={stageMap} />
       <ProFormDatePicker name="startTime" label="生效日期" />
       <ProFormDatePicker name="endTime" label="终止日期" />
+      <ProFormDatePicker name="reviewExpireTime" label="审核到期日期" />
     </ModalForm>
   );
 };

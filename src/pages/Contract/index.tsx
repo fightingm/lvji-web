@@ -241,7 +241,7 @@ const TableList: React.FC = () => {
             <h3 className="font-semibold tracking-tight text-4xl">{data?.weekExpireCount}个</h3>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-xs text-muted-foreground">合同即将到期</div>
+            <div className="text-xs text-muted-foreground">合同审核到期</div>
           </div>
         </div>
         <div className="rounded-xl border bg-card text-card-foreground shadow">
@@ -250,7 +250,7 @@ const TableList: React.FC = () => {
             <h3 className="font-semibold tracking-tight text-4xl">{data?.monthExpireCount}个</h3>
           </div>
           <div className="p-6 pt-0">
-            <div className="text-xs text-muted-foreground">合同即将到期</div>
+            <div className="text-xs text-muted-foreground">合同审核到期</div>
           </div>
         </div>
       </div>
