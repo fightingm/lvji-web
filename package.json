@@ -35,8 +35,8 @@
     "tsc": "tsc --noEmit"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
-    "**/*.{js,jsx,tsx,ts,less,md,json}": [
+    "**/*.{jsx,ts,tsx}": "npm run lint-staged:js",
+    "**/*.{jsx,tsx,ts,less,md,json}": [
       "prettier --write"
     ]
   },
@@ -58,6 +58,7 @@
     "clipboard": "^2.0.11",
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.13",
+    "diff": "^8.0.2",
     "docx-preview": "^0.3.5",
     "file-loader": "^6.2.0",
     "lodash": "^4.17.21",

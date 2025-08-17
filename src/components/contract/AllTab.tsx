@@ -1,11 +1,18 @@
-import { CopyOutlined, DownOutlined, ProfileOutlined } from '@ant-design/icons';
+import { useWebOffice } from '@/store/wps';
+import {
+  CopyOutlined,
+  DownOutlined,
+  FileDoneOutlined,
+  ProfileOutlined,
+  PushpinOutlined,
+} from '@ant-design/icons';
 import { Button, Collapse, Skeleton, message } from 'antd';
 import copy from 'copy-to-clipboard';
+import { diffChars } from 'diff';
 import { useMemo, useState } from 'react';
 
 const panelStyle: React.CSSProperties = {
   marginBottom: 24,
-  //   border: 'none',
   borderWidth: '1px',
   borderRadius: '6px',
   background: '#fff',
@@ -27,13 +34,129 @@ function Quote({ text }) {
 }
 
 function Item({ data }) {
-  const { text, revisedText, compareContent, basis } = data;
+  const { id, text, revisedText, compareContent, basis } = data;
   const [expand, setExpand] = useState(true);
+  const { instance } = useWebOffice();
+  const [revised, setRevised] = useState(false);
+
+  const showRevise = useMemo(() => {
+    return text && revisedText && text !== revisedText;
+  }, [text, revisedText]);
 
   function handleCopy() {
     copy(revisedText);
     message.success('复制成功');
   }
+  async function focusText() {
+    if (!instance?.Application) {
+      return;
+    }
+    const app = instance.Application;
+
+    // 搜索并高亮文本
+    const r = await app.ActiveDocument.Find.Execute(text, true);
+
+    if (r[0]) {
+      const { pos, len } = r[0];
+      const range = await app.ActiveDocument.Range(pos, pos + len);
+      // 滚动文档窗口, 显示指定的区域
+      await app.ActiveDocument.ActiveWindow.ScrollIntoView(range);
+    } else {
+      message.warning('因格式问题匹配原文失败，请手动定位查找');
+    }
+  }
+
+  async function find(text) {
+    if (!instance) {
+      return;
+    }
+    const app = instance.Application;
+
+    const r = await app.ActiveDocument.Find.Execute(text, true);
+    return r;
+  }
+
+  async function accept() {
+    const app = instance.Application;
+    const r = await find(text);
+    if (r[0]) {
+      const { pos } = r[0];
+      const diff = diffChars(text, revisedText);
+      let start = pos;
+      for (let i = 0; i < diff.length; i++) {
+        const item = diff[i];
+        if (item.added) {
+          const range = await app.ActiveDocument.Range(start, start);
+          range.Text = item.value;
+          start += item.count;
+          await app.ActiveDocument.Save();
+        } else if (item.removed) {
+          const range = await app.ActiveDocument.Range(start, start + item.count);
+          range.Text = '';
+          start += item.count;
+          await app.ActiveDocument.Save();
+        } else {
+          start += item.count;
+        }
+      }
+      const bookmarks = await app.ActiveDocument.Bookmarks;
+      await bookmarks.Add({
+        Name: 'WebOffice' + id,
+        Range: {
+          Start: pos,
+          End: start,
+        },
+      });
+      setRevised(true);
+    }
+  }
+
+  async function reject() {
+    const app = instance.Application;
+    const bookmark = await app.ActiveDocument.Bookmarks.Item('WebOffice' + id);
+    const start = await bookmark.Start;
+    const end = await bookmark.End;
+    const revisions = await app.ActiveDocument.Revisions;
+    const count = await revisions.Count;
+
+    let arr = [];
+
+    for (let i = 1; i <= count; i++) {
+      const revision = await revisions.Item(i);
+      const range = await revision.Range;
+      const rangeS = await range.Start;
+      const rangeE = await range.End;
+      if ((rangeS >= start && rangeS <= end) || (rangeE >= start && rangeE <= end)) {
+        arr.push(revision);
+      }
+    }
+    for (let j = arr.length; j > 0; j--) {
+      await arr[j - 1].Reject();
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200);
+      });
+    }
+
+    setRevised(false);
+  }
+
+  async function locate() {
+    const app = instance.Application;
+    if (revised) {
+      await app.ActiveDocument.Bookmarks.Item('WebOffice' + id).Select();
+    } else {
+      focusText();
+    }
+  }
+
+  async function edit() {
+    if (revised) {
+      reject();
+    } else {
+      accept();
+    }
+  }
+
   return (
     <>
       <Quote text={text} />
@@ -42,20 +165,29 @@ function Item({ data }) {
         dangerouslySetInnerHTML={{ __html: compareContent }}
       />
       <div className="mt-4 flex items-center gap-2">
-        {/* <div className="flex items-center gap-1 cursor-pointer hover:text-[#009e59]">
-          <PushpinOutlined style={{ color: '#009e59' }} />
-          <span>定位到原文</span>
-        </div> */}
         <div
           className="flex items-center gap-1 cursor-pointer hover:text-[#009e59]"
-          onClick={handleCopy}
+          onClick={locate}
         >
-          <CopyOutlined style={{ color: '#009e59' }} />
-          <span>复制修改建议</span>
+          <PushpinOutlined style={{ color: '#009e59' }} />
+          <span>定位到原文</span>
         </div>
-        {/* <div className="ml-auto flex items-center gap-1 cursor-pointer">
-          <Button icon={<FileDoneOutlined style={{ color: '#009e59' }} />}>接受修订</Button>
-        </div> */}
+        {showRevise && (
+          <div
+            className="flex items-center gap-1 cursor-pointer hover:text-[#009e59]"
+            onClick={handleCopy}
+          >
+            <CopyOutlined style={{ color: '#009e59' }} />
+            <span>复制修改建议</span>
+          </div>
+        )}
+        {showRevise && (
+          <div className="ml-auto flex items-center gap-1 cursor-pointer">
+            <Button icon={<FileDoneOutlined style={{ color: '#009e59' }} />} onClick={edit}>
+              {revised ? '撤销修订' : '接受修订'}
+            </Button>
+          </div>
+        )}
       </div>
       <div className="mt-4">
         <div
@@ -109,26 +241,29 @@ function Title({ index, data }) {
 
 export default function (props) {
   const items = useMemo(() => {
-    return props.items.map((item, index) => {
-      const data = {
-        text: item.originalContent,
-        revisedText: item.revisedContent,
-        compareContent: item.compareContent,
-        basis: [
-          {
-            tag: item.evidenceType,
-            title: item.evidenceSummary,
-            desc: item.evidenceContent,
-          },
-        ],
-      };
-      return {
-        key: index,
-        label: <Title index={index} data={item} />,
-        children: <Item data={data} />,
-        style: panelStyle,
-      };
-    });
+    return props.items
+      .filter((item) => item.originalContent && item.revisedContent)
+      .map((item, index) => {
+        const data = {
+          id: item.id,
+          text: item.originalContent,
+          revisedText: item.revisedContent,
+          compareContent: item.compareContent,
+          basis: [
+            {
+              tag: item.evidenceType,
+              title: item.evidenceSummary,
+              desc: item.evidenceContent,
+            },
+          ],
+        };
+        return {
+          key: index,
+          label: <Title index={index} data={item} />,
+          children: <Item data={data} />,
+          style: panelStyle,
+        };
+      });
   }, [props.items]);
   const defaultKeys = useMemo(() => {
     return props.items.map((_, index) => index);

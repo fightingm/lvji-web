@@ -1,5 +1,6 @@
 import AllTab from '@/components/contract/AllTab';
 import Analysis from '@/components/contract/Analysis';
+import WebOfficeProvider from '@/store/wpsProvider';
 import { FileDoneOutlined, FireOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
@@ -22,6 +23,16 @@ import Loading from './components/Loading';
 //   clauseRule: true,
 //   dealNodes: true,
 // };
+
+const sdkConfig = {
+  mode: 'sample',
+  officeType: 'w',
+  appId: 'SX20250707WNEWPR',
+  fileId: '322',
+  token: '1',
+  mount: '#wps-container',
+  //   isListenResize: false,
+};
 
 const TableList: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -191,67 +202,69 @@ const TableList: React.FC = () => {
   return (
     <div className="[&_.ant-pro-page-container-children-container]:pr-0">
       <PageContainer>
-        <div className="flex">
-          <div className="flex-1 border bg-white">
-            {/* <div
+        <WebOfficeProvider config={sdkConfig}>
+          <div className="flex">
+            <div id="wps-container" className="flex-1 border bg-white h-screen w-full">
+              {/* <div
                 id="docx"
                 className="[&_>.docx-wrapper]:p-0 [&_>.docx-wrapper]:bg-transparent h-screen overflow-auto"
             ></div> */}
-            <iframe
+              {/* <iframe
               src={`https://view.officeapps.live.com/op/view.aspx?src=${path}`}
               width="100%"
               height="100%"
               frameBorder="1"
-            ></iframe>
-          </div>
-          <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">
-            <div className="mr-4 flex-1 h-full overflow-auto [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
-              {mode === 1 ? (
-                <Analysis bd={bd} lc={lc} md={md} wy={wy} />
-              ) : loading ? (
-                <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
-                  <Loading data={task} />
-                </div>
-              ) : (
-                <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
-                  <Tabs defaultActiveKey="1" items={tabsItem} />
-                </div>
-              )}
+            ></iframe> */}
             </div>
-            <div className="shrink-0 w-[60px] bg-[#f2f3f5] px-2 py-6 h-screen overflow-hidden">
-              <div
-                className={`cursor-pointer text-center text-xs hover:font-bold ${
-                  mode === 0 && 'font-bold'
-                }`}
-                onClick={() => setMode(0)}
-              >
-                <div
-                  className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
-                    mode === 0 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
-                  }`}
-                >
-                  <FireOutlined />
-                </div>
-                <div className="mt-1">审查</div>
+            <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">
+              <div className="mr-4 flex-1 h-full overflow-auto [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
+                {mode === 1 ? (
+                  <Analysis bd={bd} lc={lc} md={md} wy={wy} />
+                ) : loading ? (
+                  <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
+                    <Loading data={task} />
+                  </div>
+                ) : (
+                  <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
+                    <Tabs defaultActiveKey="1" items={tabsItem} />
+                  </div>
+                )}
               </div>
-              <div
-                className={`mt-6 cursor-pointer text-center text-xs hover:font-bold ${
-                  mode === 1 && 'font-bold'
-                }`}
-                onClick={() => setMode(1)}
-              >
+              <div className="shrink-0 w-[60px] bg-[#f2f3f5] px-2 py-6 h-screen overflow-hidden">
                 <div
-                  className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
-                    mode === 1 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
+                  className={`cursor-pointer text-center text-xs hover:font-bold ${
+                    mode === 0 && 'font-bold'
                   }`}
+                  onClick={() => setMode(0)}
                 >
-                  <FileDoneOutlined />
+                  <div
+                    className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
+                      mode === 0 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
+                    }`}
+                  >
+                    <FireOutlined />
+                  </div>
+                  <div className="mt-1">审查</div>
                 </div>
-                <div className="mt-1">解析</div>
+                <div
+                  className={`mt-6 cursor-pointer text-center text-xs hover:font-bold ${
+                    mode === 1 && 'font-bold'
+                  }`}
+                  onClick={() => setMode(1)}
+                >
+                  <div
+                    className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
+                      mode === 1 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
+                    }`}
+                  >
+                    <FileDoneOutlined />
+                  </div>
+                  <div className="mt-1">解析</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </WebOfficeProvider>
       </PageContainer>
     </div>
   );

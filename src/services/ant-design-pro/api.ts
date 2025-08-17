@@ -339,3 +339,12 @@ export async function getResultList(params) {
     },
   });
 }
+
+export async function updateAdvice(options?: { [key: string]: any }) {
+  return request('/api/llm-service/updateAdvice', {
+    method: 'PUT',
+    data: {
+      ...(options || {}),
+    },
+  });
+}
