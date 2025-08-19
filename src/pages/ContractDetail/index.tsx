@@ -5,7 +5,6 @@ import { FileDoneOutlined, FireOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useParams } from '@umijs/max';
 import { Tabs, message } from 'antd';
-import { renderAsync } from 'docx-preview';
 import React, { useEffect, useMemo, useState } from 'react';
 import Loading from './components/Loading';
 
@@ -24,21 +23,39 @@ import Loading from './components/Loading';
 //   dealNodes: true,
 // };
 
-const sdkConfig = {
-  mode: 'sample',
-  officeType: 'w',
-  appId: 'SX20250707WNEWPR',
-  fileId: '322',
-  token: '1',
-  mount: '#wps-container',
-  //   isListenResize: false,
-};
+// const sdkConfig = 0;
+// = {
+//   mode: 'sample',
+//   officeType: 'w',
+//   appId: 'SX20250707WNEWPR',
+//   fileId: '322',
+//   token: '1',
+//   mount: '#wps-container',
+//   //   isListenResize: false,
+// };
 
 const TableList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [task, setTask] = useState([]);
   const params = useParams();
   const [mode, setMode] = useState(0);
+  const [fileId, setFileId] = useState();
+
+  const sdkConfig = useMemo(() => {
+    const token = window.localStorage.getItem('token');
+    if (!fileId || !token) {
+      return null;
+    }
+    return {
+      mode: 'sample',
+      officeType: 'w',
+      appId: 'SX20250707WNEWPR',
+      fileId,
+      token,
+      mount: '#wps-container',
+    };
+  }, [fileId]);
+
   // 合同标的
   const [bd, setBd] = useState('');
 
@@ -53,8 +70,6 @@ const TableList: React.FC = () => {
 
   // 交易流程
   const [lc, setLc] = useState([]);
-
-  const [path, setPath] = useState('');
 
   const [items, setItems] = useState([]);
 
@@ -71,7 +86,6 @@ const TableList: React.FC = () => {
       }?Authorization=${token.slice(7)}`,
     );
     ws.onopen = function () {
-      console.log('open', wsParams);
       ws.send(wsParams);
     };
     ws.onmessage = function (evt) {
@@ -79,7 +93,7 @@ const TableList: React.FC = () => {
       console.log('onmessage', data);
       if (data.type) {
         if (data.type === 'file') {
-          setPath(data.path);
+          setFileId(data.fileId);
         } else if (data.type === '合同标的') {
           setBd(data.mdContent);
         } else if (data.type === '目的审查') {
@@ -119,25 +133,6 @@ const TableList: React.FC = () => {
       ws.close();
     };
   }, [params.id]);
-
-  useEffect(() => {
-    if (true) {
-      return;
-    }
-    // https://yema-1252530263.cos.ap-chengdu.myqcloud.com/test/67d53255533aeb080253ef2a.doc
-    // fetch('/test/67d53255533aeb080253ef2a.doc')
-    fetch('/1.docx')
-      .then((res) => {
-        console.log('xxxx', res);
-        return res.arrayBuffer();
-      })
-      .then((data) => {
-        return renderAsync(data, document.getElementById('docx') as HTMLElement);
-      })
-      .catch(function (error) {
-        console.log('xxxx', error);
-      });
-  }, [path]);
 
   const [items1, items2, items3, items4, items5] = useMemo(() => {
     // 高风险，合同标的，合同条款，文字符号，自定义策略
@@ -202,69 +197,60 @@ const TableList: React.FC = () => {
   return (
     <div className="[&_.ant-pro-page-container-children-container]:pr-0">
       <PageContainer>
-        <WebOfficeProvider config={sdkConfig}>
-          <div className="flex">
-            <div id="wps-container" className="flex-1 border bg-white h-screen w-full">
-              {/* <div
-                id="docx"
-                className="[&_>.docx-wrapper]:p-0 [&_>.docx-wrapper]:bg-transparent h-screen overflow-auto"
-            ></div> */}
-              {/* <iframe
-              src={`https://view.officeapps.live.com/op/view.aspx?src=${path}`}
-              width="100%"
-              height="100%"
-              frameBorder="1"
-            ></iframe> */}
-            </div>
-            <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">
-              <div className="mr-4 flex-1 h-full overflow-auto [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
-                {mode === 1 ? (
-                  <Analysis bd={bd} lc={lc} md={md} wy={wy} />
-                ) : loading ? (
-                  <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
-                    <Loading data={task} />
-                  </div>
-                ) : (
-                  <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
-                    <Tabs defaultActiveKey="1" items={tabsItem} />
-                  </div>
-                )}
-              </div>
-              <div className="shrink-0 w-[60px] bg-[#f2f3f5] px-2 py-6 h-screen overflow-hidden">
-                <div
-                  className={`cursor-pointer text-center text-xs hover:font-bold ${
-                    mode === 0 && 'font-bold'
-                  }`}
-                  onClick={() => setMode(0)}
-                >
-                  <div
-                    className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
-                      mode === 0 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
-                    }`}
-                  >
-                    <FireOutlined />
-                  </div>
-                  <div className="mt-1">审查</div>
+        {sdkConfig && (
+          <WebOfficeProvider config={sdkConfig}>
+            <div className="flex">
+              <div id="wps-container" className="flex-1 border bg-white h-screen w-full"></div>
+              <div className="flex shrink-0 w-[622px] px-2 h-screen overflow-hidden">
+                <div className="mr-4 flex-1 h-full overflow-auto [&_.ant-tabs]:h-full [&_>.ant-tabs-content-holder]:!flex-1 [&_.ant-tabs-content-holder]:!overflow-auto">
+                  {mode === 1 ? (
+                    <Analysis bd={bd} lc={lc} md={md} wy={wy} />
+                  ) : loading ? (
+                    <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
+                      <Loading data={task} />
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border bg-[#f7f8fa] shadow p-6 pt-0">
+                      <Tabs defaultActiveKey="1" items={tabsItem} />
+                    </div>
+                  )}
                 </div>
-                <div
-                  className={`mt-6 cursor-pointer text-center text-xs hover:font-bold ${
-                    mode === 1 && 'font-bold'
-                  }`}
-                  onClick={() => setMode(1)}
-                >
+                <div className="shrink-0 w-[60px] bg-[#f2f3f5] px-2 py-6 h-screen overflow-hidden">
                   <div
-                    className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
-                      mode === 1 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
+                    className={`cursor-pointer text-center text-xs hover:font-bold ${
+                      mode === 0 && 'font-bold'
                     }`}
+                    onClick={() => setMode(0)}
                   >
-                    <FileDoneOutlined />
+                    <div
+                      className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
+                        mode === 0 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
+                      }`}
+                    >
+                      <FireOutlined />
+                    </div>
+                    <div className="mt-1">审查</div>
                   </div>
-                  <div className="mt-1">解析</div>
+                  <div
+                    className={`mt-6 cursor-pointer text-center text-xs hover:font-bold ${
+                      mode === 1 && 'font-bold'
+                    }`}
+                    onClick={() => setMode(1)}
+                  >
+                    <div
+                      className={`w-[40px] h-[40px] rounded-xl hover:bg-white flex justify-center items-center text-lg ${
+                        mode === 1 ? 'bg-white text-[#009e59]' : 'bg-[#e5e6eb]'
+                      }`}
+                    >
+                      <FileDoneOutlined />
+                    </div>
+                    <div className="mt-1">解析</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </WebOfficeProvider>
+          </WebOfficeProvider>
+        )}
       </PageContainer>
     </div>
   );
