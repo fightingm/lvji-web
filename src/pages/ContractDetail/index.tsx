@@ -49,7 +49,7 @@ const TableList: React.FC = () => {
     return {
       mode: 'sample',
       officeType: 'w',
-      appId: 'SX20250707WNEWPR',
+      appId: 'AK20250915UQIAZX',
       fileId,
       token,
       mount: '#wps-container',

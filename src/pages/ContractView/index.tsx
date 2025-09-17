@@ -48,7 +48,7 @@ const ContractView: React.FC = () => {
     return {
       mode: 'sample',
       officeType: 'w',
-      appId: 'SX20250707WNEWPR',
+      appId: 'AK20250915UQIAZX',
       fileId: data?.fileId,
       token: token,
       mount: '#wps-container',
