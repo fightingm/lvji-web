@@ -1,12 +1,14 @@
+import { updateAdvice } from '@/services/ant-design-pro/api';
 import { useWebOffice } from '@/store/wps';
 import {
   CopyOutlined,
   DownOutlined,
+  EditOutlined,
   FileDoneOutlined,
   ProfileOutlined,
   PushpinOutlined,
 } from '@ant-design/icons';
-import { Button, Collapse, Skeleton, message } from 'antd';
+import { Button, Collapse, Input, Modal, Skeleton, message } from 'antd';
 import copy from 'copy-to-clipboard';
 import { diffChars } from 'diff';
 import { useMemo, useState } from 'react';
@@ -34,10 +36,15 @@ function Quote({ text }) {
 }
 
 function Item({ data }) {
-  const { id, text, revisedText, compareContent, basis } = data;
+  const { id, text, basis } = data;
+  const [revisedText, setRevisedText] = useState(data.revisedText);
+  const [compareContent, setCompareContent] = useState(data.compareContent);
   const [expand, setExpand] = useState(true);
   const { instance } = useWebOffice();
   const [revised, setRevised] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [editVisible, setEditVisible] = useState<boolean>(false);
+  const [editVale, setEditValue] = useState('');
 
   const showRevise = useMemo(() => {
     return text && revisedText && text !== revisedText;
@@ -157,6 +164,30 @@ function Item({ data }) {
     }
   }
 
+  function showEdit() {
+    setEditValue(revisedText);
+    setEditVisible(true);
+  }
+  function handleEditChange(e) {
+    setEditValue(e.target.value);
+  }
+  async function editAdvice() {
+    try {
+      setLoading(true);
+      const result = await await updateAdvice({
+        chunkId: id,
+        revisedContent: editVale,
+      });
+      setRevisedText(editVale);
+      setCompareContent(result.data.compareContent);
+      setEditVisible(false);
+      setLoading(false);
+    } catch (error) {
+      message.error('修改失败，请重试');
+      setLoading(false);
+    }
+  }
+
   return (
     <>
       <Quote text={text} />
@@ -181,8 +212,13 @@ function Item({ data }) {
             <span>复制修改建议</span>
           </div>
         )}
+        <div className="ml-auto flex items-center gap-1 cursor-pointer">
+          <Button icon={<EditOutlined style={{ color: '#009e59' }} />} onClick={showEdit}>
+            修改
+          </Button>
+        </div>
         {showRevise && (
-          <div className="ml-auto flex items-center gap-1 cursor-pointer">
+          <div className="ml-1 flex items-center gap-1 cursor-pointer">
             <Button icon={<FileDoneOutlined style={{ color: '#009e59' }} />} onClick={edit}>
               {revised ? '撤销修订' : '接受修订'}
             </Button>
@@ -222,6 +258,19 @@ function Item({ data }) {
           </div>
         </div>
       </div>
+
+      <Modal
+        title="修改建议"
+        width={600}
+        okButtonProps={{ loading }}
+        open={editVisible}
+        onOk={editAdvice}
+        onCancel={() => setEditVisible(false)}
+      >
+        <div className="py-4">
+          <Input.TextArea value={editVale} rows={5} onChange={handleEditChange} />
+        </div>
+      </Modal>
     </>
   );
 }
