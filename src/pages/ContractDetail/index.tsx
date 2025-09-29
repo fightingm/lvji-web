@@ -81,9 +81,9 @@ const TableList: React.FC = () => {
     }
 
     const ws = new WebSocket(
-      `ws://175.27.214.13/api/llm-service/review-contract/${params.id}?Authorization=${token.slice(
-        7,
-      )}`,
+      `ws://175.27.214.13:11086/api/llm-service/review-contract/${
+        params.id
+      }?Authorization=${token.slice(7)}`,
     );
     ws.onopen = function () {
       ws.send(wsParams);
